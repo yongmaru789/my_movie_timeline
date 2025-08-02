@@ -1,26 +1,46 @@
 import { useState } from 'react';
+import './App.css';
 
 function App() {
-
-  const [date, setDate] = useState("");
-  const [title, setTitle] = useState("");
   const [movies, setMovies] = useState([]);
+  const [date, setDate] = useState('');
+  const [title, setTitle] = useState('');
+  const [editIndex, setEditIndex] = useState(null);
+  const [editTitle, setEditTitle] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!date || !title) return;
 
-    if (date && title) {
-      const newMovie = { date, title };
-      setMovies([...movies, newMovie]);
-      setDate("");
-      setTitle("");
-    }
+    const newMovie = { date, title };
+    setMovies([...movies, newMovie]);
+
+    setDate('');
+    setTitle('');
+  };
+
+  const handleDelete = (indexToDelete) => {
+    const newMovies = movies.filter((_, idx) => idx !== indexToDelete);
+    setMovies(newMovies);
+  };
+
+  const startEdit = (index, currentTitle) => {
+    setEditIndex(index);
+    setEditTitle(currentTitle);
+  };
+
+  const handleUpdate = (index) => {
+    const updatedMovies = movies.map((movie, idx) =>
+      idx === index ? { ...movie, title: editTitle } : movie
+    );
+    setMovies(updatedMovies);
+    setEditIndex(null);
+    setEditTitle('');
   };
 
   return (
-    <>
-      <h1>인생 영화 타임라인</h1>
-      <p>내 인생의 각 시기를 기록해보는 공간</p>
+    <div className="App">
+      <h1>🎬 인생 영화 타임라인</h1>
 
       <form onSubmit={handleSubmit}>
         <input
@@ -30,7 +50,7 @@ function App() {
         />
         <input
           type="text"
-          placeholder="영화 제목"
+          placeholder="영화 제목을 입력하세요"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
@@ -40,13 +60,27 @@ function App() {
       <ul>
         {movies.map((movie, index) => (
           <li key={index}>
-            {movie.date} - {movie.title}
+            <strong>{movie.date}</strong> -&nbsp;
+            {editIndex === index ? (
+              <>
+                <input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                />
+                <button onClick={() => handleUpdate(index)}>저장</button>
+              </>
+            ) : (
+              <>
+                {movie.title}
+                <button onClick={() => startEdit(index, movie.title)}>수정</button>
+              </>
+            )}
+            <button onClick={() => handleDelete(index)}>삭제</button>
           </li>
         ))}
       </ul>
-    </>
+    </div>
   );
 }
 
 export default App;
-
