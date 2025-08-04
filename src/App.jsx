@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
@@ -8,25 +8,45 @@ function App() {
   const [editIndex, setEditIndex] = useState(null);
   const [editTitle, setEditTitle] = useState('');
 
+  useEffect(() => {
+    const stored = localStorage.getItem("my_movie_timeline");
+    console.log('로컬스토리지에 저장된 값:', stored); 
+
+    if (stored) {
+    const parsed = JSON.parse(stored);
+    console.log('파싱된 영화 목록:', parsed);    
+    setMovies(parsed);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (movies.length > 0) {
+      localStorage.setItem("my_movie_timeline", JSON.stringify(movies));
+      console.log('저장됨:', JSON.stringify(movies));
+    }    
+  }, [movies]);
+
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!date || !title) return;
 
     const newMovie = { date, title };
-    setMovies([...movies, newMovie]);
-
+    const updatedMovies = [...movies, newMovie];
+    
+    setMovies(updatedMovies);    
     setDate('');
     setTitle('');
   };
 
   const handleDelete = (indexToDelete) => {
-    const newMovies = movies.filter((_, idx) => idx !== indexToDelete);
-    setMovies(newMovies);
+    const updated = movies.filter((_, idx) => idx !== indexToDelete);
+    setMovies(updated);    
   };
 
-  const startEdit = (index, currentTitle) => {
+  const startEdit = (index) => {
     setEditIndex(index);
-    setEditTitle(currentTitle);
+    setEditTitle(movies[index].title);
   };
 
   const handleUpdate = (index) => {
