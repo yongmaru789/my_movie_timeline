@@ -5,8 +5,10 @@ function App() {
   const [movies, setMovies] = useState([]);
   const [date, setDate] = useState('');
   const [title, setTitle] = useState('');
+  const [comment, setComment] = useState('');
   const [editIndex, setEditIndex] = useState(null);
   const [editTitle, setEditTitle] = useState('');
+  const [editComment, setEditComment] = useState('');
 
   useEffect(() => {
     const stored = localStorage.getItem("my_movie_timeline");
@@ -31,12 +33,14 @@ function App() {
     e.preventDefault();
     if (!date || !title) return;
 
-    const newMovie = { date, title };
+    const newMovie = { date, title, comment };
     const updatedMovies = [...movies, newMovie];
     
     setMovies(updatedMovies);    
+
     setDate('');
     setTitle('');
+    setComment('');
   };
 
   const handleDelete = (indexToDelete) => {
@@ -47,15 +51,19 @@ function App() {
   const startEdit = (index) => {
     setEditIndex(index);
     setEditTitle(movies[index].title);
+    setEditComment(movies[index].comment || '');
   };
 
   const handleUpdate = (index) => {
     const updatedMovies = movies.map((movie, idx) =>
-      idx === index ? { ...movie, title: editTitle } : movie
-    );
+      idx === index 
+        ? { ...movie, title: editTitle, comment: editComment } 
+        : movie
+      );
     setMovies(updatedMovies);
     setEditIndex(null);
     setEditTitle('');
+    setEditComment('');
   };
 
   return (
@@ -74,6 +82,12 @@ function App() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
+        <input
+          type="text"
+          placeholder="감상평"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
         <button type="submit">등록</button>
       </form>
 
@@ -87,11 +101,16 @@ function App() {
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                 />
+                <input
+                  value={editComment}
+                  onChange={(e) => setEditComment(e.target.value)}
+                />
                 <button onClick={() => handleUpdate(index)}>저장</button>
               </>
             ) : (
               <>
                 {movie.title}
+                <div style={{ fontStyle: 'italic', color: '#666' }}>{movie.comment}</div> 
                 <button onClick={() => startEdit(index, movie.title)}>수정</button>
               </>
             )}
