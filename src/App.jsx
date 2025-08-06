@@ -9,22 +9,19 @@ function App() {
   const [editIndex, setEditIndex] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editComment, setEditComment] = useState('');
+  const [sortOrder, setSortOrder] = useState('newest');
 
   useEffect(() => {
     const stored = localStorage.getItem("my_movie_timeline");
-    console.log('로컬스토리지에 저장된 값:', stored); 
-
     if (stored) {
-    const parsed = JSON.parse(stored);
-    console.log('파싱된 영화 목록:', parsed);    
-    setMovies(parsed);
+      const parsed = JSON.parse(stored);
+      setMovies(parsed);
     }
   }, []);
 
   useEffect(() => {
     if (movies.length > 0) {
       localStorage.setItem("my_movie_timeline", JSON.stringify(movies));
-      console.log('저장됨:', JSON.stringify(movies));
     }    
   }, [movies]);
 
@@ -66,6 +63,14 @@ function App() {
     setEditComment('');
   };
 
+  const sortedMovies = [...movies].sort((a, b) => {
+    if (sortOrder === 'newest' ) {
+      return new Date(b.date) - new Date(a.date);
+    } else {
+      return new Date(a.date) - new Date(b.date);
+    }
+  })
+
   return (
     <div className="App">
       <h1>🎬 인생 영화 타임라인</h1>
@@ -91,8 +96,13 @@ function App() {
         <button type="submit">등록</button>
       </form>
 
+      <div style={{ marginTop: '10px' }}>
+        <button onClick={() => setSortOrder('newest')}>최신순</button>
+        <button onClick={() => setSortOrder('oldest')}>오래된순</button>
+      </div>
+
       <ul>
-        {movies.map((movie, index) => (
+        {sortedMovies.map((movie, index) => (
           <li key={index}>
             <strong>{movie.date}</strong> -&nbsp;
             {editIndex === index ? (
