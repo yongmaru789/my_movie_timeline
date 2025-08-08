@@ -10,6 +10,8 @@ function App() {
   const [editTitle, setEditTitle] = useState('');
   const [editComment, setEditComment] = useState('');
   const [sortOrder, setSortOrder] = useState('newest');
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("my_movie_timeline");
@@ -17,13 +19,13 @@ function App() {
       const parsed = JSON.parse(stored);
       setMovies(parsed);
     }
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (movies.length > 0) {
-      localStorage.setItem("my_movie_timeline", JSON.stringify(movies));
-    }    
-  }, [movies]);
+    if (!hydrated) return;
+    localStorage.setItem("my_movie_timeline", JSON.stringify(movies));
+  }, [movies, hydrated]);
 
   
   const handleSubmit = (e) => {
@@ -71,6 +73,14 @@ function App() {
     }
   })
 
+  const filteredMovies = sortedMovies.filter((m) => {
+    const kw = searchKeyword.trim().toLowerCase();
+    if (!kw) return true;
+    const t = (m.title || '').toLowerCase();
+    const c = (m.comment || '').toLowerCase();
+    return t.includes(kw) || c.includes(kw);
+  })
+
   return (
     <div className="App">
       <h1>🎬 인생 영화 타임라인</h1>
@@ -97,15 +107,24 @@ function App() {
       </form>
 
       <div style={{ marginTop: '10px' }}>
+        <input
+          type="text"
+          placeholder="검색어를 입력하세요 (제목/감상평)"
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          style={{ padding: '6px 8px', width: 260, marginRight: 8}}
+        />
         <button onClick={() => setSortOrder('newest')}>최신순</button>
         <button onClick={() => setSortOrder('oldest')}>오래된순</button>
       </div>
 
       <ul>
-        {sortedMovies.map((movie, index) => (
-          <li key={index}>
+        {filteredMovies.map((movie) => {
+          const originalIndex = movies.indexOf(movie);
+          return (
+            <li key={originalIndex}>
             <strong>{movie.date}</strong> -&nbsp;
-            {editIndex === index ? (
+            {editIndex === originalIndex ? (
               <>
                 <input
                   value={editTitle}
@@ -115,18 +134,19 @@ function App() {
                   value={editComment}
                   onChange={(e) => setEditComment(e.target.value)}
                 />
-                <button onClick={() => handleUpdate(index)}>저장</button>
+                <button onClick={() => handleUpdate(originalIndex)}>저장</button>
               </>
             ) : (
               <>
                 {movie.title}
                 <div style={{ fontStyle: 'italic', color: '#666' }}>{movie.comment}</div> 
-                <button onClick={() => startEdit(index, movie.title)}>수정</button>
+                <button onClick={() => startEdit(originalIndex)}>수정</button>
               </>
             )}
-            <button onClick={() => handleDelete(index)}>삭제</button>
+            <button onClick={() => handleDelete(originalIndex)}>삭제</button>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </div>
   );
