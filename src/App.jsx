@@ -114,6 +114,18 @@ function App() {
           value={poster}
           onChange={(e) => setPoster(e.target.value)}
         />
+
+        {poster.trim() && (
+          <div style={{ marginTop: 8}}>
+            <img
+              src={poster}
+              alt="포스터 미리보기"
+              style={{ width: 120, height: 'auto', borderRadius: 8, objectFit: 'cover' }}
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          </div>
+        )}
+
         <button type="submit">등록</button>
       </form>
 
