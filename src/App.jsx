@@ -6,17 +6,18 @@ function App() {
   const [date, setDate] = useState('');
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
-  const [poster, setPoster] = useState('');  //
+  const [poster, setPoster] = useState('');
   const [editIndex, setEditIndex] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editComment, setEditComment] = useState('');
-  const [editPoster, setEditPoster] = useState(''); //
+  const [editPoster, setEditPoster] = useState('');
   const [sortOrder, setSortOrder] = useState('newest');
   const [searchKeyword, setSearchKeyword] = useState('');
   const [hydrated, setHydrated] = useState(false);
 
+  
   useEffect(() => {
-    const stored = localStorage.getItem("my_movie_timeline");
+    const stored = localStorage.getItem('my_movie_timeline');
     if (stored) {
       const parsed = JSON.parse(stored);
       setMovies(parsed);
@@ -24,9 +25,10 @@ function App() {
     setHydrated(true);
   }, []);
 
+  
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem("my_movie_timeline", JSON.stringify(movies));
+    localStorage.setItem('my_movie_timeline', JSON.stringify(movies));
   }, [movies, hydrated]);
 
   
@@ -34,202 +36,209 @@ function App() {
     e.preventDefault();
     if (!date || !title) return;
 
-    const newMovie = { date, title, comment, poster };  //
+    const newMovie = { date, title, comment, poster };
     const updatedMovies = [...movies, newMovie];
-    
-    setMovies(updatedMovies);    
 
+    setMovies(updatedMovies);
     setDate('');
     setTitle('');
     setComment('');
-    setPoster('');   //
+    setPoster('');
   };
 
+  
   const handleDelete = (indexToDelete) => {
     const updated = movies.filter((_, idx) => idx !== indexToDelete);
-    setMovies(updated);    
+    setMovies(updated);
   };
 
+  
   const startEdit = (index) => {
     setEditIndex(index);
     setEditTitle(movies[index].title);
     setEditComment(movies[index].comment || '');
-    setEditPoster(movies[index].poster || '');  //
+    setEditPoster(movies[index].poster || '');
   };
 
+  
   const handleUpdate = (index) => {
     const updatedMovies = movies.map((movie, idx) =>
-      idx === index 
-        ? { ...movie, title: editTitle, comment: editComment, poster: editPoster } 
+      idx === index
+        ? { ...movie, title: editTitle, comment: editComment, poster: editPoster }
         : movie
-      );
+    );
     setMovies(updatedMovies);
     setEditIndex(null);
     setEditTitle('');
     setEditComment('');
-    setEditPoster(''); //
+    setEditPoster('');
   };
 
+  
   const sortedMovies = [...movies].sort((a, b) => {
-    if (sortOrder === 'newest' ) {
+    if (sortOrder === 'newest') {
       return new Date(b.date) - new Date(a.date);
     } else {
       return new Date(a.date) - new Date(b.date);
     }
-  })
+  });
 
+  
   const filteredMovies = sortedMovies.filter((m) => {
     const kw = searchKeyword.trim().toLowerCase();
     if (!kw) return true;
     const t = (m.title || '').toLowerCase();
     const c = (m.comment || '').toLowerCase();
     return t.includes(kw) || c.includes(kw);
-  })
+  });
 
+  
   return (
-    <div className="App">
+    <div className="App app-container">
       <h1>🎬 인생 영화 타임라인</h1>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="영화 제목을 입력하세요"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+      <form onSubmit={handleSubmit} className="form">
+        <div className="form-row">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="영화 제목"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+
         <input
           type="text"
           placeholder="감상평"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
-        <input   //
+
+        <input
           type="text"
-          placeholder="포스터 이미지 URL (선택)"
+          placeholder="포스터 이미지 URL"
           value={poster}
           onChange={(e) => setPoster(e.target.value)}
         />
 
+        
         {poster.trim() && (
-          <div style={{ marginTop: 8}}>
-            <img
-              src={poster}
-              alt="포스터 미리보기"
-              style={{ width: 120, height: 'auto', borderRadius: 8, objectFit: 'cover' }}
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-          </div>
+          <img
+            src={poster}
+            alt="포스터 미리보기"
+            className="poster-preview-sm"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
         )}
 
-        <button type="submit">등록</button>
+        <button type="submit" className="btn submit-btn">등록</button>
       </form>
 
-      <div style={{ marginTop: '10px' }}>
+      
+      <div className="toolbar">
         <input
           type="text"
-          placeholder="검색어를 입력하세요 (제목/감상평)"
+          placeholder="제목/감상평 검색"
           value={searchKeyword}
           onChange={(e) => setSearchKeyword(e.target.value)}
-          style={{ padding: '6px 8px', width: 260, marginRight: 8}}
+          className="search-input"
         />
-        <button onClick={() => setSortOrder('newest')}>최신순</button>
-        <button onClick={() => setSortOrder('oldest')}>오래된순</button>
+        <button
+          onClick={() => setSortOrder('newest')}
+          className={`btn ${sortOrder === 'newest' ? 'btn--active' : ''}`}
+        >
+          최신순
+        </button>
+        <button
+          onClick={() => setSortOrder('oldest')}
+          className={`btn ${sortOrder === 'oldest' ? 'btn--active' : ''}`}
+        >
+          오래된순
+        </button>
       </div>
 
-      <ul>
+      
+      {filteredMovies.length === 0 && (
+        <div className="empty">아직 등록한 영화가 없습니다.</div>
+      )}
+
+      
+      <div className="card-grid">
         {filteredMovies.map((movie) => {
-          const originalIndex = movies.indexOf(movie);
+          const originalIndex = movies.indexOf(movie); 
+
           return (
-            <li key={originalIndex} style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 12, alignItems: 'start' }}>
-              <div>
+            <div key={originalIndex} className="card">
+              
+              <div className="card-poster">
                 {editIndex === originalIndex ? (
                   editPoster ? (
-                    <img 
+                    <img
                       src={editPoster}
                       alt="포스터 미리보기"
-                      style={{ width: 120, height: 'auto', borderRadius: 8, objectFit: 'cover'}}
-                      onError={(e) => {e.currentTarget.style.display = 'none'; }}
+                      className="card-poster-img"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
-                  ) : (
-                    <div
-                      style={{
-                        width: 120, height: 160, background: '#f1f3f5',
-                        borderRadius: 8, display: 'flex', alignItems: 'center',
-                        justifyContent: 'center', color: '#888'
-                      }}
-                    >
-                    </div>
-                  )
+                  ) : null
                 ) : movie.poster ? (
                   <img
                     src={movie.poster}
                     alt={`${movie.title} 포스터`}
-                    style={{ width: 120, height: 'auto', borderRadius: 8, objectFit: 'cover' }}
+                    className="card-poster-img"
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
-                ) : (
-                  <div
-                    style={{
-                      width: 120, height: 160, background: '#f1f3f5',
-                      borderRadius: 8, display: 'flex', alignItems: 'center',
-                      justifyContent: 'center', color: '#888'
-                    }}
-                  >
-                  </div>
-                )}
+                ) : null}
               </div>
+
               
-              <div>
-                <strong>{movie.date}</strong>
-                <br/>
+              <div className="card-body">
+                <div className="date-text">{movie.date}</div>
+
                 {editIndex === originalIndex ? (
                   <>
-                     <input
+                    <input
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
                       placeholder="제목"
-                      style={{ display: 'block', marginTop: 6 }}
+                      className="input-block"
                     />
                     <input
                       value={editComment}
                       onChange={(e) => setEditComment(e.target.value)}
                       placeholder="감상평"
-                      style={{ display: 'block', marginTop: 6 }}
+                      className="input-block"
                     />
                     <input
                       value={editPoster}
                       onChange={(e) => setEditPoster(e.target.value)}
                       placeholder="포스터 이미지 URL"
-                      style={{ display: 'block', marginTop: 6 }}
+                      className="input-block"
                     />
-                    <button onClick={() => handleUpdate(originalIndex)} style={{ marginTop: 8 }}>
-                      저장
-                    </button>
+                    <div className="btn-row">
+                      <button onClick={() => handleUpdate(originalIndex)} className="btn">저장</button>
+                      <button onClick={() => setEditIndex(null)} className="btn">취소</button>
+                    </div>
                   </>
                 ) : (
                   <>
-                    <div style={{ marginTop: 6 }}>{movie.title}</div>
-                    <div style={{ fontStyle: 'italic', color: '#666' }}>{movie.comment}</div>
-                    <button onClick={() => startEdit(originalIndex)} style={{ marginTop: 8 }}>
-                      수정
-                    </button>
+                    <div className="card-title">{movie.title}</div>
+                    <div className="card-comment">{movie.comment}</div>
+                    <div className="btn-row">
+                      <button onClick={() => startEdit(originalIndex)} className="btn">수정</button>
+                      <button onClick={() => handleDelete(originalIndex)} className="btn">삭제</button>
+                    </div>
                   </>
                 )}
-                <button onClick={() => handleDelete(originalIndex)} style={{ marginLeft: 8 }}>
-                  삭제
-                </button>
               </div>
-
-            </li>            
+            </div>
           );
         })}
-      </ul>
-
+      </div>
     </div>
   );
 }
