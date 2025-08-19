@@ -179,7 +179,6 @@ function App() {
   const handlePickSuggestion = async (item) => {
     
     setTitle(item.title || item.name || '');
-    setTmdbQuery(item.title || item.name || '');
 
     const url = item.poster_path ? `${TMDB_IMG_BASE}${item.poster_path}` : '';
     setPoster(url);
@@ -195,7 +194,7 @@ function App() {
     setTmdbResults([]);
   };
 
-  // 드롭다운 외부 클릭 닫기
+  
   useEffect(() => {
     const onClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
