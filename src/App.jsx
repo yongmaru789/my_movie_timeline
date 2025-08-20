@@ -1,21 +1,27 @@
 import { useState, useEffect, useRef } from 'react';
 import './App.css';
+import { useApp } from "./store/AppContext";
 
 const TMDB_IMG_BASE = 'https://image.tmdb.org/t/p/w500';
 
+
 function App() {
-  const [movies, setMovies] = useState([]);
+  
+  const { state, actions } = useApp();
+  const movies = state.movies; 
+
   const [date, setDate] = useState('');
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
   const [poster, setPoster] = useState('');
-  const [editIndex, setEditIndex] = useState(null);
+
+  const [editId, setEditId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editComment, setEditComment] = useState('');
   const [editPoster, setEditPoster] = useState('');
+
   const [sortOrder, setSortOrder] = useState('newest');
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [hydrated, setHydrated] = useState(false);
 
   const [tmdbQuery, setTmdbQuery] = useState('');
   const [tmdbResults, setTmdbResults] = useState([]);
@@ -25,24 +31,7 @@ function App() {
   const abortRef = useRef(null);
   const debounceRef = useRef(null);
   const dropdownRef = useRef(null);
-
   const selectedTmdbRef = useRef(null);
-
-  
-  useEffect(() => {
-    const stored = localStorage.getItem('my_movie_timeline');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      setMovies(parsed);
-    }
-    setHydrated(true);
-  }, []);
-
-  
-  useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem('my_movie_timeline', JSON.stringify(movies));
-  }, [movies, hydrated]);
 
   
   const handleSubmit = (e) => {
@@ -53,8 +42,8 @@ function App() {
     if (selectedTmdbRef.current?.tmdbId) newMovie.tmdbId = selectedTmdbRef.current.tmdbId;
     if (selectedTmdbRef.current?.genres) newMovie.genres = selectedTmdbRef.current.genres;
 
-    setMovies([...movies, newMovie]);
-    
+    actions.addMovie(newMovie);
+
     setDate('');
     setTitle('');
     setComment('');
@@ -66,34 +55,32 @@ function App() {
   };
 
   
-  const handleDelete = (indexToDelete) => {
-    const updated = movies.filter((_, idx) => idx !== indexToDelete);
-    setMovies(updated);
+  const handleDelete = (id) => {
+    if (!id) return; 
+    actions.deleteMovie(id);
   };
 
   
-  const startEdit = (index) => {
-    setEditIndex(index);
-    setEditTitle(movies[index].title);
-    setEditComment(movies[index].comment || '');
-    setEditPoster(movies[index].poster || '');
+  const startEdit = (id) => {
+    const target = movies.find(m => m.id === id);
+    if (!target) return;
+    setEditId(id);
+    setEditTitle(target.title);
+    setEditComment(target.comment || '');
+    setEditPoster(target.poster || '');
   };
 
-  
-  const handleUpdate = (index) => {
-    const updatedMovies = movies.map((movie, idx) =>
-      idx === index
-        ? { ...movie, title: editTitle, comment: editComment, poster: editPoster }
-        : movie
-    );
-    setMovies(updatedMovies);
-    setEditIndex(null);
+  const handleUpdate = (id) => {
+    const target = movies.find(m => m.id === id);
+    if (!target) return;
+    const updated = { ...target, title: editTitle, comment: editComment, poster: editPoster };
+    actions.updateMovie(updated);
+    setEditId(null);
     setEditTitle('');
     setEditComment('');
     setEditPoster('');
   };
 
-  
   const sortedMovies = [...movies].sort((a, b) => {
     if (sortOrder === 'newest') {
       return new Date(b.date) - new Date(a.date);
@@ -102,7 +89,6 @@ function App() {
     }
   });
 
-  
   const filteredMovies = sortedMovies.filter((m) => {
     const kw = searchKeyword.trim().toLowerCase();
     if (!kw) return true;
@@ -112,8 +98,7 @@ function App() {
     return t.includes(kw) || c.includes(kw) || g.includes(kw);
   });
 
-
-
+  
   const handleTitleChange = (e) => {
     const v = e.target.value;
     setTitle(v);
@@ -141,7 +126,6 @@ function App() {
         setTmdbError('');
 
         const key = import.meta.env.VITE_TMDB_API_KEY;
-        console.log("TMDB API KEY:", key);
         const url = `https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${encodeURIComponent(q)}&language=ko-KR&page=1&include_adult=false`;
         const res = await fetch(url, { signal: ctrl.signal });
         if (!res.ok) throw new Error('TMDB 검색 실패');
@@ -162,7 +146,6 @@ function App() {
     };
   }, [tmdbQuery]);
 
-  
   const fetchTmdbDetail = async (id) => {
     try {
       const key = import.meta.env.VITE_TMDB_API_KEY;
@@ -175,26 +158,21 @@ function App() {
     }
   };
 
-  
+  // TMDB 추천 선택 (그대로)
   const handlePickSuggestion = async (item) => {
-    
     setTitle(item.title || item.name || '');
-
     const url = item.poster_path ? `${TMDB_IMG_BASE}${item.poster_path}` : '';
     setPoster(url);
 
     const detail = await fetchTmdbDetail(item.id);
     const genres = detail?.genres?.map(g => g.name) || [];
-    selectedTmdbRef.current = {
-      tmdbId: item.id,
-      genres,
-    };
+    selectedTmdbRef.current = { tmdbId: item.id, genres };
 
     setShowDropdown(false);
     setTmdbResults([]);
   };
 
-  
+  // 자동완성 패널 외부 클릭 닫기 (그대로)
   useEffect(() => {
     const onClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -205,9 +183,7 @@ function App() {
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
 
-  
 
-  
   return (
     <div className="App app-container">
       <h1>🎬 인생 영화 타임라인</h1>
@@ -219,7 +195,7 @@ function App() {
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
-          
+
           <div className="title-autocomplete" ref={dropdownRef}>
             <input
               type="text"
@@ -271,15 +247,12 @@ function App() {
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
-
         <input
           type="text"
           placeholder="포스터 이미지 URL"
           value={poster}
           onChange={(e) => setPoster(e.target.value)}
         />
-
-        
         {poster.trim() && (
           <img
             src={poster}
@@ -292,7 +265,6 @@ function App() {
         <button type="submit" className="btn submit-btn">등록</button>
       </form>
 
-      
       <div className="toolbar">
         <input
           type="text"
@@ -315,21 +287,21 @@ function App() {
         </button>
       </div>
 
-      
       {filteredMovies.length === 0 && (
         <div className="empty">아직 등록한 영화가 없습니다.</div>
       )}
 
-      
       <div className="card-grid">
         {filteredMovies.map((movie) => {
-          const originalIndex = movies.indexOf(movie); 
+          
+          const originalIndex = movies.indexOf(movie);
+          const id = movie.id; 
+          const isEditing = editId && id && editId === id;
 
           return (
-            <div key={originalIndex} className="card" aria-hidden="true">
-              
+            <div key={id || originalIndex} className="card" aria-hidden="true">
               <div className="card-poster">
-                {editIndex === originalIndex ? (
+                {isEditing ? (
                   editPoster ? (
                     <img
                       src={editPoster}
@@ -348,7 +320,6 @@ function App() {
                 ) : null}
               </div>
 
-              
               <div className="card-body">
                 <div className="date-text">{movie.date}</div>
                 <div className="card-title">{movie.title}</div>
@@ -361,7 +332,7 @@ function App() {
                   </div>
                 )}
 
-                {editIndex === originalIndex ? (
+                {isEditing ? (
                   <>
                     <input
                       value={editTitle}
@@ -382,16 +353,17 @@ function App() {
                       className="input-block"
                     />
                     <div className="btn-row">
-                      <button onClick={() => handleUpdate(originalIndex)} className="btn">저장</button>
-                      <button onClick={() => setEditIndex(null)} className="btn">취소</button>
+                      <button onClick={() => handleUpdate(id)} className="btn">저장</button>
+                      <button onClick={() => setEditId(null)} className="btn">취소</button>
                     </div>
                   </>
                 ) : (
                   <>
                     <div className="card-comment">{movie.comment}</div>
                     <div className="btn-row">
-                      <button onClick={() => startEdit(originalIndex)} className="btn">수정</button>
-                      <button onClick={() => handleDelete(originalIndex)} className="btn">삭제</button>
+                      {/* id 없는 오래된 항목은 편집/삭제 버튼 비활성화 처리 */}
+                      <button onClick={() => id && startEdit(id)} className="btn" disabled={!id}>수정</button>
+                      <button onClick={() => id && handleDelete(id)} className="btn" disabled={!id}>삭제</button>
                     </div>
                   </>
                 )}
