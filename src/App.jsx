@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { useApp } from "./store/AppContext";
+import { Button, Input } from "./components/UiPrimitives";
+import Card from "./components/Card";
 
 const TMDB_IMG_BASE = 'https://image.tmdb.org/t/p/w500';
 
@@ -158,7 +160,7 @@ function App() {
     }
   };
 
-  // TMDB 추천 선택 (그대로)
+  
   const handlePickSuggestion = async (item) => {
     setTitle(item.title || item.name || '');
     const url = item.poster_path ? `${TMDB_IMG_BASE}${item.poster_path}` : '';
@@ -172,7 +174,7 @@ function App() {
     setTmdbResults([]);
   };
 
-  // 자동완성 패널 외부 클릭 닫기 (그대로)
+
   useEffect(() => {
     const onClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -185,192 +187,198 @@ function App() {
 
 
   return (
-    <div className="App app-container">
-      <h1>🎬 인생 영화 타임라인</h1>
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+        
+        <h1 className="text-2xl font-bold mb-4">인생 영화 타임라인</h1>
 
-      <form onSubmit={handleSubmit} className="form" autoComplete="off">
-        <div className="form-row">
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-
-          <div className="title-autocomplete" ref={dropdownRef}>
-            <input
-              type="text"
-              placeholder="영화 제목"
-              value={title}
-              onChange={handleTitleChange}
-              onFocus={() => setShowDropdown(!!title.trim())}
+        <form onSubmit={handleSubmit} className="form space-y-3 mb-6" autoComplete="off">
+          <div className="form-row">
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="sm:w-40"
             />
-            {showDropdown && (
-              <div className="ac-panel">
-                {tmdbLoading && <div className="ac-item muted">검색 중</div>}
-                {tmdbError && <div className="ac-item error">{tmdbError}</div>}
-                {!tmdbLoading && !tmdbError && tmdbResults.length === 0 && (
-                  <div className="ac-item muted">검색 결과가 없습니다.</div>
-                )}
-                {tmdbResults.map((it) => (
-                  <button
-                    type="button"
-                    key={`${it.id}-${it.release_date}`}
-                    className="ac-item"
-                    onClick={() => handlePickSuggestion(it)}
-                  >
-                    <div className="ac-thumb">
-                      {it.poster_path ? (
-                        <img src={`${TMDB_IMG_BASE}${it.poster_path}`} alt="" />
-                      ) : (
-                        <div className="no-thumb">NO</div>
-                      )}
-                    </div>
-                    <div className="ac-meta">
-                      <div className="ac-title">{it.title || it.name}</div>
-                      <div className="ac-sub">
-                        {it.release_date ? it.release_date.slice(0, 4) : '—'}
-                        {it.original_title && it.original_title !== it.title
-                          ? ` · ${it.original_title}`
-                          : ''}
+
+            <div className="title-autocomplete" ref={dropdownRef}>
+              <Input
+                type="text"
+                placeholder="영화 제목"
+                value={title}
+                onChange={handleTitleChange}
+                onFocus={() => setShowDropdown(!!title.trim())}
+              />
+              {showDropdown && (
+                <div className="ac-panel">
+                  {tmdbLoading && <div className="ac-item muted">검색 중</div>}
+                  {tmdbError && <div className="ac-item error">{tmdbError}</div>}
+                  {!tmdbLoading && !tmdbError && tmdbResults.length === 0 && (
+                    <div className="ac-item muted">검색 결과가 없습니다.</div>
+                  )}
+                  {tmdbResults.map((it) => (
+                    <button
+                      type="button"
+                      key={`${it.id}-${it.release_date}`}
+                      className="ac-item"
+                      onClick={() => handlePickSuggestion(it)}
+                    >
+                      <div className="ac-thumb">
+                        {it.poster_path ? (
+                          <img src={`${TMDB_IMG_BASE}${it.poster_path}`} alt="" />
+                        ) : (
+                          <div className="no-thumb">NO</div>
+                        )}
                       </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+                      <div className="ac-meta">
+                        <div className="ac-title">{it.title || it.name}</div>
+                        <div className="ac-sub">
+                          {it.release_date ? it.release_date.slice(0, 4) : '—'}
+                          {it.original_title && it.original_title !== it.title
+                            ? ` · ${it.original_title}`
+                            : ''}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+
+          <Input
+            type="text"
+            placeholder="감상평"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+          <Input
+            type="text"
+            placeholder="포스터 이미지 URL"
+            value={poster}
+            onChange={(e) => setPoster(e.target.value)}
+          />
+          {poster.trim() && (
+            <img
+              src={poster}
+              alt="포스터 미리보기"
+              className="h-36 w-auto rounded-lg border border-gray-200"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          )}
+
+          <Button className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:text-white">
+            등록
+          </Button>
+        </form>
+
+
+        <div className="flex items-center gap-2 mb-4">
+          <Input
+            className="flex-1"
+            type="text"
+            placeholder="제목/감상평/장르 검색"
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+          />
+          <Button
+            onClick={() => setSortOrder('newest')}
+            className={
+              sortOrder === 'newest'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-blue-100 text-black border-blue-100'
+            }
+          >
+            최신순
+          </Button>
+          <Button
+            onClick={() => setSortOrder('oldest')}
+            className={
+              sortOrder === 'oldest'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-blue-100 text-black border-blue-100'
+            }
+          >
+            오래된순
+          </Button>
         </div>
 
-        <input
-          type="text"
-          placeholder="감상평"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="포스터 이미지 URL"
-          value={poster}
-          onChange={(e) => setPoster(e.target.value)}
-        />
-        {poster.trim() && (
-          <img
-            src={poster}
-            alt="포스터 미리보기"
-            className="poster-preview-sm"
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          />
+
+        {filteredMovies.length === 0 && (
+          <div className="empty">아직 등록한 영화가 없습니다.</div>
         )}
 
-        <button type="submit" className="btn submit-btn">등록</button>
-      </form>
 
-      <div className="toolbar">
-        <input
-          type="text"
-          placeholder="제목/감상평/장르 검색"
-          value={searchKeyword}
-          onChange={(e) => setSearchKeyword(e.target.value)}
-          className="search-input"
-        />
-        <button
-          onClick={() => setSortOrder('newest')}
-          className={`btn ${sortOrder === 'newest' ? 'btn--active' : ''}`}
-        >
-          최신순
-        </button>
-        <button
-          onClick={() => setSortOrder('oldest')}
-          className={`btn ${sortOrder === 'oldest' ? 'btn--active' : ''}`}
-        >
-          오래된순
-        </button>
-      </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {filteredMovies.map((movie) => {
+            const originalIndex = movies.indexOf(movie);
+            const id = movie.id;
+            const isEditing = editId && id && editId === id;
 
-      {filteredMovies.length === 0 && (
-        <div className="empty">아직 등록한 영화가 없습니다.</div>
-      )}
-
-      <div className="card-grid">
-        {filteredMovies.map((movie) => {
-          
-          const originalIndex = movies.indexOf(movie);
-          const id = movie.id; 
-          const isEditing = editId && id && editId === id;
-
-          return (
-            <div key={id || originalIndex} className="card" aria-hidden="true">
-              <div className="card-poster">
-                {isEditing ? (
-                  editPoster ? (
-                    <img
-                      src={editPoster}
-                      alt="포스터 미리보기"
-                      className="card-poster-img"
-                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                    />
-                  ) : null
-                ) : movie.poster ? (
-                  <img
-                    src={movie.poster}
-                    alt={`${movie.title} 포스터`}
-                    className="card-poster-img"
-                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                  />
-                ) : null}
-              </div>
-
-              <div className="card-body">
-                <div className="date-text">{movie.date}</div>
-                <div className="card-title">{movie.title}</div>
-
-                {Array.isArray(movie.genres) && movie.genres.length > 0 && (
-                  <div className="genre-chips">
-                    {movie.genres.map((g) => (
-                      <span key={g} className="chip">{g}</span>
-                    ))}
+            return (
+              <Card key={id || originalIndex}>
+                <div className={`p-4 flex gap-4 ${isEditing ? "bg-blue-50" : ""}`}>
+                  <div className="w-24 shrink-0">
+                    {isEditing ? (
+                      editPoster ? (
+                        <img
+                          src={editPoster}
+                          alt="포스터 미리보기"
+                          className="h-36 w-auto rounded-lg border"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                      ) : null
+                    ) : movie.poster ? (
+                      <img
+                        src={movie.poster}
+                        alt={`${movie.title} 포스터`}
+                        className="h-36 w-auto rounded-lg border"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="h-36 rounded-lg bg-gray-100" />
+                    )}
                   </div>
-                )}
 
-                {isEditing ? (
-                  <>
-                    <input
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                      placeholder="제목"
-                      className="input-block"
-                    />
-                    <input
-                      value={editComment}
-                      onChange={(e) => setEditComment(e.target.value)}
-                      placeholder="감상평"
-                      className="input-block"
-                    />
-                    <input
-                      value={editPoster}
-                      onChange={(e) => setEditPoster(e.target.value)}
-                      placeholder="포스터 이미지 URL"
-                      className="input-block"
-                    />
-                    <div className="btn-row">
-                      <button onClick={() => handleUpdate(id)} className="btn">저장</button>
-                      <button onClick={() => setEditId(null)} className="btn">취소</button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="card-comment">{movie.comment}</div>
-                    <div className="btn-row">
-                      {/* id 없는 오래된 항목은 편집/삭제 버튼 비활성화 처리 */}
-                      <button onClick={() => id && startEdit(id)} className="btn" disabled={!id}>수정</button>
-                      <button onClick={() => id && handleDelete(id)} className="btn" disabled={!id}>삭제</button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          );
-        })}
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-500">{movie.date}</div>
+                    <div className="text-lg font-semibold">{movie.title}</div>
+
+                    {Array.isArray(movie.genres) && movie.genres.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {movie.genres.map((g) => (
+                          <span key={g} className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-xs border">
+                            {g}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {isEditing ? (
+                      <div className="mt-3 space-y-2">
+                        <Input value={editTitle} onChange={(e)=>setEditTitle(e.target.value)} placeholder="제목" />
+                        <Input value={editComment} onChange={(e)=>setEditComment(e.target.value)} placeholder="감상평" />
+                        <Input value={editPoster} onChange={(e)=>setEditPoster(e.target.value)} placeholder="포스터 이미지 URL" />
+                        <div className="flex gap-2">
+                          <Button onClick={() => handleUpdate(id)} className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700">저장</Button>
+                          <Button onClick={() => setEditId(null)}>취소</Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        {movie.comment && <p className="mt-2 text-gray-700">{movie.comment}</p>}
+                        <div className="mt-3 flex gap-2">
+                          <Button onClick={() => id && startEdit(id)} disabled={!id}>수정</Button>
+                          <Button onClick={() => id && handleDelete(id)} disabled={!id} className="bg-red-500 text-white border-red-500 hover:bg-red-600">삭제</Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
