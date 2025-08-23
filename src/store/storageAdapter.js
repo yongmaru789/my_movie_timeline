@@ -1,23 +1,25 @@
-const KEY = "my_movie_timeline";
-
-export const storage = {
-  load() {
-    try {
-      const raw = localStorage.getItem(KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-      console.warn("[storage.load] parse error", e);
-      return null;
-    }
-  },
-  save(state) {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(state));
-    } catch (e) {
-      console.warn("[storage.save] setItem error", e);
-    }
-  },
-  clear() {
-    localStorage.removeItem(KEY);
+export function load(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    console.warn("[storage.load] parse error", e);
+    return null;
   }
-};
+}
+
+export function save(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    console.warn("[storage.save] setItem error", e);
+  }
+}
+
+export function clear(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (e) {
+    console.warn("[storage.clear] removeItem error", e);
+  }
+}
