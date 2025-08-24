@@ -1,12 +1,11 @@
-# React + Vite
+# my_movie_timeline
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+영화 감상 기록을 저장하고 관리할 수 있는 연습용 웹 프로젝트.
+React 기반으로 구현되었으며, TMDB API를 활용해 영화를 검색하고 등록할 수 있습니다.
 
-Currently, two official plugins are available:
+## 주요 기능
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 영화 검색 : TMDB API 연동을 통한 실시간 영화 검색
+- 영화 등록/삭제 : 관심 있는 영화를 타임라인에 추가 및 삭제
+- 데이터 저장 : localStorage를 활용한 offline-first 구조로 데이터 보존
+- (향후 개선 예정)
