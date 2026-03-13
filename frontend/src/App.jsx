@@ -212,7 +212,7 @@ function App() {
         <h1 className="text-2xl font-bold mb-4">인생 영화 타임라인</h1>
 
         <form onSubmit={handleSubmit} className="form space-y-3 mb-6" autoComplete="off">
-          <div className="form-row">
+          <div className="flex flex-col gap-4">
             <Input
               type="date"
               value={date}
@@ -286,7 +286,7 @@ function App() {
               }}
             />
           )}
-          <Button className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:text-white">
+          <Button className="bg-gray-100 text-black border-black hover:bg-gray-200 hover:text-white">
             등록
           </Button>
         </form>
@@ -303,8 +303,8 @@ function App() {
             onClick={() => setSortOrder("newest")}
             className={
               sortOrder === "newest"
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-blue-100 text-black border-blue-100"
+                ? "bg-gray-200 text-black border-black"
+                : "bg-white text-black border-gray-300"
             }
           >
             최신순
@@ -313,8 +313,8 @@ function App() {
             onClick={() => setSortOrder("oldest")}
             className={
               sortOrder === "oldest"
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-blue-100 text-black border-blue-100"
+                ? "bg-gray-200 text-black border-black"
+                : "bg-white text-black border-gray-300"
             }
           >
             오래된순
@@ -412,7 +412,7 @@ function App() {
                           <Button
                             onClick={() => id && handleDelete(id)}
                             disabled={!id}
-                            className="bg-red-500 text-white border-red-500 hover:bg-red-600"
+                            className="text-red-500 border-gray-300 bg-white hover:bg-red-50"
                           >
                             삭제
                           </Button>
