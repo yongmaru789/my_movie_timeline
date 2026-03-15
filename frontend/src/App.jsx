@@ -10,6 +10,74 @@ export const TMDB_IMG_BASE = "https://image.tmdb.org/t/p/w200";
 const TMDB_BEARER = import.meta.env.VITE_TMDB_BEARER?.trim();
 const TMDB_KEY = import.meta.env.VITE_TMDB_KEY?.trim();
 
+function clampRating(value) {
+  return Math.max(0, Math.min(5, Math.round(value * 2) / 2));
+}
+
+function StarIcon({ fillPercent = 0, size = 28 }) {
+  const starPath =
+    "M12 2.5l2.938 5.953 6.569.955-4.753 4.633 1.122 6.543L12 17.49l-5.876 3.094 1.122-6.543L2.493 9.408l6.569-.955L12 2.5z";
+
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} className="shrink-0">
+      <defs>
+        <clipPath id={`clip-${size}-${fillPercent}`}>
+          <rect x="0" y="0" width={`${fillPercent}%`} height="24" />
+        </clipPath>
+      </defs>
+
+      <path d={starPath} fill="#e5e7eb" stroke="#111827" strokeWidth="1.2" />
+      <path
+        d={starPath}
+        fill="#facc15"
+        stroke="#111827"
+        strokeWidth="1.2"
+        clipPath={`url(#clip-${size}-${fillPercent})`}
+      />
+    </svg>
+  );
+}
+
+function RatingStars({
+  value,
+  onChange,
+  interactive = false,
+  size = 28,
+  showText = true,
+}) {
+  const handleWheel = (e) => {
+    if (!interactive || !onChange) return;
+    e.preventDefault();
+
+    const next = e.deltaY < 0 ? value + 0.5 : value - 0.5;
+    onChange(clampRating(next));
+  };
+
+  return (
+    <div className="flex items-center gap-3">
+      <div
+        className={`${interactive ? "cursor-ns-resize select-none" : ""} flex items-center gap-1`}
+        onWheel={handleWheel}
+        title={interactive ? "마우스 휠로 0.5점 단위 조절" : ""}
+      >
+        {[1, 2, 3, 4, 5].map((starIndex) => {
+          let fillPercent = 0;
+          if (value >= starIndex) fillPercent = 100;
+          else if (value >= starIndex - 0.5) fillPercent = 50;
+
+          return <StarIcon key={starIndex} fillPercent={fillPercent} size={size} />;
+        })}
+      </div>
+
+      {showText && (
+        <span className="text-sm font-medium text-gray-700 min-w-[3rem]">
+          {value.toFixed(1)} / 5.0
+        </span>
+      )}
+    </div>
+  );
+}
+
 async function tmdbFetch(path, { signal } = {}) {
   if (TMDB_BEARER) {
     const res = await fetch(`${TMDB_BASE}${path}`, {
@@ -55,12 +123,12 @@ function App() {
 
   const [date, setDate] = useState("");
   const [title, setTitle] = useState("");
-  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(0);
   const [poster, setPoster] = useState("");
 
   const [editId, setEditId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
-  const [editComment, setEditComment] = useState("");
+  const [editRating, setEditRating] = useState(0);
   const [editPoster, setEditPoster] = useState("");
 
   const [sortOrder, setSortOrder] = useState("newest");
@@ -81,7 +149,7 @@ function App() {
     e.preventDefault();
     if (!date || !title) return;
 
-    const newMovie = { date, title, comment, poster };
+    const newMovie = { date, title, rating, poster };
     if (selectedTmdbRef.current?.tmdbId) newMovie.tmdbId = selectedTmdbRef.current.tmdbId;
     if (selectedTmdbRef.current?.genres) newMovie.genres = selectedTmdbRef.current.genres;
 
@@ -93,7 +161,7 @@ function App() {
 
     setDate("");
     setTitle("");
-    setComment("");
+    setRating(0);
     setPoster("");
     setTmdbQuery("");
     setTmdbResults([]);
@@ -111,18 +179,18 @@ function App() {
     if (!target) return;
     setEditId(id);
     setEditTitle(target.title);
-    setEditComment(target.comment || "");
+    setEditRating(target.rating ?? 0);
     setEditPoster(target.poster || "");
   };
 
   const handleUpdate = (id) => {
     const target = movies.find((m) => m.id === id);
     if (!target) return;
-    const updated = { ...target, title: editTitle, comment: editComment, poster: editPoster };
+    const updated = { ...target, title: editTitle, rating: editRating, poster: editPoster };
     actions.updateMovie(updated);
     setEditId(null);
     setEditTitle("");
-    setEditComment("");
+    setEditRating(0);
     setEditPoster("");
   };
 
@@ -135,9 +203,9 @@ function App() {
     const kw = searchKeyword.trim().toLowerCase();
     if (!kw) return true;
     const t = (m.title || "").toLowerCase();
-    const c = (m.comment || "").toLowerCase();
     const g = Array.isArray(m.genres) ? m.genres.join(" ").toLowerCase() : "";
-    return t.includes(kw) || c.includes(kw) || g.includes(kw);
+    const r = m.rating != null ? String(m.rating) : "";
+    return t.includes(kw) || g.includes(kw) || r.includes(kw);
   });
 
   const handleTitleChange = (e) => {
@@ -238,7 +306,7 @@ function App() {
                     <button
                       type="button"
                       key={`${it.id}-${it.release_date}`}
-                      className="ac-item"
+                      className="ac-item border border-black bg-white hover:bg-gray-50"
                       onClick={() => handlePickSuggestion(it)}
                     >
                       <div className="ac-thumb">
@@ -264,12 +332,14 @@ function App() {
             </div>
           </div>
 
-          <Input
-            type="text"
-            placeholder="감상평"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
+          <div className="rounded-xl border border-gray-300 bg-white px-4 py-3">
+            <div className="mb-2 text-sm font-medium text-gray-700">별점</div>
+            <RatingStars value={rating} onChange={setRating} interactive />
+            <p className="mt-2 text-xs text-gray-500">
+              별 영역 위에서 마우스 휠을 올리면 +0.5점, 내리면 -0.5점입니다.
+            </p>
+          </div>
+
           <Input
             type="text"
             placeholder="포스터 이미지 URL"
@@ -286,7 +356,7 @@ function App() {
               }}
             />
           )}
-          <Button className="bg-gray-100 text-black border-black hover:bg-gray-200 hover:text-white">
+          <Button className="bg-gray-100 text-black hover:bg-gray-200">
             등록
           </Button>
         </form>
@@ -295,7 +365,7 @@ function App() {
           <Input
             className="flex-1"
             type="text"
-            placeholder="제목/감상평/장르 검색"
+            placeholder="제목/장르/별점 검색"
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
           />
@@ -303,8 +373,8 @@ function App() {
             onClick={() => setSortOrder("newest")}
             className={
               sortOrder === "newest"
-                ? "bg-gray-200 text-black border-black"
-                : "bg-white text-black border-gray-300"
+                ? "bg-gray-200 text-black hover:bg-gray-300"
+                : "bg-white text-black hover:bg-gray-100"
             }
           >
             최신순
@@ -313,8 +383,8 @@ function App() {
             onClick={() => setSortOrder("oldest")}
             className={
               sortOrder === "oldest"
-                ? "bg-gray-200 text-black border-black"
-                : "bg-white text-black border-gray-300"
+                ? "bg-gray-200 text-black hover:bg-gray-300"
+                : "bg-white text-black hover:bg-gray-100"
             }
           >
             오래된순
@@ -375,6 +445,12 @@ function App() {
                       </div>
                     )}
 
+                    {movie.rating != null && (
+                      <div className="mt-2">
+                        <RatingStars value={movie.rating} size={20} showText />
+                      </div>
+                    )}
+
                     {isEditing ? (
                       <div className="mt-3 space-y-2">
                         <Input
@@ -382,11 +458,10 @@ function App() {
                           onChange={(e) => setEditTitle(e.target.value)}
                           placeholder="제목"
                         />
-                        <Input
-                          value={editComment}
-                          onChange={(e) => setEditComment(e.target.value)}
-                          placeholder="감상평"
-                        />
+                        <div className="rounded-xl border border-gray-300 bg-white px-3 py-3">
+                          <div className="mb-2 text-sm font-medium text-gray-700">별점 수정</div>
+                          <RatingStars value={editRating} onChange={setEditRating} interactive />
+                        </div>
                         <Input
                           value={editPoster}
                           onChange={(e) => setEditPoster(e.target.value)}
@@ -395,7 +470,7 @@ function App() {
                         <div className="flex gap-2">
                           <Button
                             onClick={() => handleUpdate(id)}
-                            className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+                            className="bg-blue-600 text-white hover:bg-blue-700"
                           >
                             저장
                           </Button>
@@ -404,7 +479,6 @@ function App() {
                       </div>
                     ) : (
                       <>
-                        {movie.comment && <p className="mt-2 text-gray-700">{movie.comment}</p>}
                         <div className="mt-3 flex gap-2">
                           <Button onClick={() => id && startEdit(id)} disabled={!id}>
                             수정
@@ -412,7 +486,7 @@ function App() {
                           <Button
                             onClick={() => id && handleDelete(id)}
                             disabled={!id}
-                            className="text-red-500 border-gray-300 bg-white hover:bg-red-50"
+                            className="text-red-500 bg-white hover:bg-red-50"
                           >
                             삭제
                           </Button>
