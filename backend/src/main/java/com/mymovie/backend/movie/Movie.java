@@ -1,6 +1,7 @@
 package com.mymovie.backend.movie;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "movies")
@@ -11,8 +12,8 @@ public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
+
     private String title;
     private double rating;
     private String memo;
@@ -21,6 +22,11 @@ public class Movie {
     private String poster;
     private String userId;
     private Long tmdbId;
+
+    @ElementCollection
+    @CollectionTable(name="movie_genres")
+    @Column(name = "genre")
+    private List<String> genres;
 
     public double getRating() {
         return rating;
@@ -92,5 +98,13 @@ public class Movie {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public List<String> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<String> genres) {
+        this.genres = genres;
     }
 }
