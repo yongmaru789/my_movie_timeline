@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000";
+const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
 const DEV_USER_ID = import.meta.env.VITE_DEV_USER_ID || "dev-user-1";
 
 async function json(res) {
@@ -15,8 +15,9 @@ export const Api = {
   },
 
   async listMovies(userId = DEV_USER_ID) {
-    const res = await fetch(`${BASE}/api/movies?userId=${encodeURIComponent(userId)}`);
-    return json(res); 
+    const res = await fetch(`${BASE}/api/movies`);
+    const movies = await json(res);
+    return { movies };
   },
 
   async createMovie(payload) {
@@ -25,7 +26,8 @@ export const Api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    return json(res); 
+    const movie = await json(res);
+    return { movie };
   },
 
   async updateMovie(id, payload) {
@@ -34,11 +36,12 @@ export const Api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    return json(res); 
+    const movie = await json(res);
+    return { movie };
   },
 
   async deleteMovie(id) {
     const res = await fetch(`${BASE}/api/movies/${id}`, { method: "DELETE" });
-    return json(res); 
+    return {};
   },
 };

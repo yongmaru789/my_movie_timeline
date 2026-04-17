@@ -14,9 +14,45 @@ public class Movie {
 
     private Long id;
     private String title;
-    private int rating;
+    private double rating;
     private String memo;
     private String watchedDate;
+    private String date;
+    private String poster;
+    private String userId;
+    private Long tmdbId;
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public String getPoster() {
+        return poster;
+    }
+
+    public void setPoster(String poster) {
+        this.poster = poster;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public Long getTmdbId() {
+        return tmdbId;
+    }
+
+    public void setTmdbId(Long tmdbId) {
+        this.tmdbId = tmdbId;
+    }
 
     public Long getId() {
         return id;
@@ -34,14 +70,6 @@ public class Movie {
         this.title = title;
     }
 
-    public int getRating() {
-        return rating;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
-    }
-
     public String getMemo() {
         return memo;
     }
@@ -56,5 +84,13 @@ public class Movie {
 
     public void setWatchedDate(String watchedDate) {
         this.watchedDate = watchedDate;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }
