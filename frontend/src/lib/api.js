@@ -14,8 +14,8 @@ export const Api = {
     return DEV_USER_ID;
   },
 
-  async listMovies(userId = DEV_USER_ID) {
-    const res = await fetch(`${BASE}/api/movies`);
+  async listMovies(userId) {
+    const res = await fetch(`${BASE}/api/movies?userId=${userId}`);
     const movies = await json(res);
     return { movies };
   },

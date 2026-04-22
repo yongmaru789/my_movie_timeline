@@ -36,4 +36,9 @@ public class UserService {
         return jwtUtil.generateToken(username);
     }
 
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 아이디입니다."));
+    }
+
 }

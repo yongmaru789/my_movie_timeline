@@ -14,8 +14,8 @@ public class MovieController {
     }
 
     @GetMapping
-    public List<Movie> getAllMovies() {
-        return movieService.getAllMovies();
+    public List<Movie> getMoviesByUserId(@RequestParam String userId) {
+        return movieService.getMoviesByUserId(userId);
     }
 
     @PostMapping

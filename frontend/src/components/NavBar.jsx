@@ -1,7 +1,10 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useApp } from "../store/AppContext";
 
 export default function NavBar() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { state, actions } = useApp();
 
   const Item = ({ to, label }) => (
     <Link
@@ -14,6 +17,11 @@ export default function NavBar() {
     </Link>
   );
 
+  const handleLogout = () => {
+    actions.logout();
+    navigate("/login");
+  };
+
   return (
     <header className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200">
       <nav className="w-full px-6 py-3 flex items-center justify-between">
@@ -21,8 +29,17 @@ export default function NavBar() {
         <div className="flex items-center gap-2">
           <Item to="/" label="홈" />
           <Item to="/timeline" label="타임라인" />
-          <Item to="/login" label="로그인" />
-        </div>        
+          {state.user ? (
+            <button
+              onClick={handleLogout}
+              className="px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition"
+            >
+              로그아웃
+            </button>
+          ) : (
+            <Item to="/login" label="로그인" />
+          )}
+        </div>
       </nav>
     </header>
   );

@@ -24,8 +24,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody Map<String, String> body) {
-        String token = userService.login(body.get("username"), body.get("password"));
-        return Map.of("token", token);
+    public Map<String, Object> login(@RequestBody Map<String, String> body) {
+        String username = body.get("username");
+        String token = userService.login(username, body.get("password"));
+        User user = userService.findByUsername(username);
+        return Map.of(
+                "token", token,
+                "userId", user.getId(),
+                "username", user.getUsername()
+        );
     }
 }

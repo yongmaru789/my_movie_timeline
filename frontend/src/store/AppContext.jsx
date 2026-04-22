@@ -30,6 +30,10 @@ function reducer(state, action) {
       };
     case "DELETE":
       return { ...state, movies: state.movies.filter((m) => m.id !== action.payload) };
+    case "LOGIN":
+      return { ...state, user: action.payload };
+    case "LOGOUT":
+      return { ...state, user: null, movies: [] };
     default:
       return state;
   }
@@ -63,16 +67,23 @@ export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
+
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    if (token && userId) {
+      dispatch({ type: "LOGIN", payload: { id: userId } });
+    }
+
     let cancelled = false;
 
     (async () => {
       try {
-        const userId = Api.devUserId();
+        const devUserId = Api.devUserId();
 
         migrateStorageKey();
         const cached = storage.load(KEY);
         const bootstrap = {
-          user: cached?.user || { id: userId },
+          user: cached?.user || { id: devUserId },
           movies: Array.isArray(cached?.movies) ? cached.movies : [],
         };
         if (!cancelled) {
@@ -80,12 +91,12 @@ export function AppProvider({ children }) {
         }
 
         try {
-          const { movies: remoteMovies = [] } = await Api.listMovies(userId);
+          const { movies: remoteMovies = [] } = await Api.listMovies(devUserId);
           const merged = mergeById(bootstrap.movies, remoteMovies);
           if (!cancelled) {
-            dispatch({ type: "INIT", payload: { user: { id: userId }, movies: merged } });
+            dispatch({ type: "INIT", payload: { user: { id: devUserId }, movies: merged } });
           }
-          storage.save(KEY, { user: { id: userId }, movies: merged });
+          storage.save(KEY, { user: { id: devUserId }, movies: merged });
         } catch {
           
         }
@@ -142,6 +153,26 @@ export function AppProvider({ children }) {
         storage.save(KEY, { user: state.user, movies: next });
       }
     },
+
+    async login(username, password) {
+      const res = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!res.ok) throw new Error("login failed");
+      const data = await res.json();  // { token, userId, username } 형태
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.userId);
+      dispatch({ type: "LOGIN", payload: { id: data.userId, username: data.username } });
+    },
+
+    logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
+      dispatch({ type: "LOGOUT" });
+    },
+
   };
 
   return (

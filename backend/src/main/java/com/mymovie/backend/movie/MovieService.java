@@ -12,8 +12,8 @@ public class MovieService {
         this.movieRepository = movieRepository;
     }
 
-    public List<Movie> getAllMovies() {
-        return movieRepository.findAll();
+    public List<Movie> getMoviesByUserId(String userId) {
+        return movieRepository.findByUserId(userId);
     }
 
     public Movie addMovie(Movie movie) {
