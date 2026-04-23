@@ -78,12 +78,12 @@ export function AppProvider({ children }) {
 
     (async () => {
       try {
-        const devUserId = Api.devUserId();
+        const currentUserId = userId || Api.devUserId();
 
         migrateStorageKey();
         const cached = storage.load(KEY);
         const bootstrap = {
-          user: cached?.user || { id: devUserId },
+          user: cached?.user || { id: currentUserId },
           movies: Array.isArray(cached?.movies) ? cached.movies : [],
         };
         if (!cancelled) {
@@ -91,12 +91,12 @@ export function AppProvider({ children }) {
         }
 
         try {
-          const { movies: remoteMovies = [] } = await Api.listMovies(devUserId);
+          const { movies: remoteMovies = [] } = await Api.listMovies(currentUserId);
           const merged = mergeById(bootstrap.movies, remoteMovies);
           if (!cancelled) {
-            dispatch({ type: "INIT", payload: { user: { id: devUserId }, movies: merged } });
+            dispatch({ type: "INIT", payload: { user: { id: currentUserId }, movies: merged } });
           }
-          storage.save(KEY, { user: { id: devUserId }, movies: merged });
+          storage.save(KEY, { user: { id: currentUserId }, movies: merged });
         } catch {
           
         }
@@ -165,11 +165,18 @@ export function AppProvider({ children }) {
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
       dispatch({ type: "LOGIN", payload: { id: data.userId, username: data.username } });
+    
+      try {
+        const {movies} = await Api.listMovies(String(data.userId));
+        dispatch({ type: "INIT", payload: {user : {id: String(data.userId), username: data.username}, movies } });
+      } catch {
+      }
     },
 
     logout() {
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
+      storage.clear(KEY);
       dispatch({ type: "LOGOUT" });
     },
 
