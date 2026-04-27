@@ -78,7 +78,11 @@ export function AppProvider({ children }) {
 
     (async () => {
       try {
-        const currentUserId = userId || Api.devUserId();
+        if (!token || !userId) {
+          dispatch({ type: "INIT", payload: { movies: [] } });
+          return;
+        }
+        const currentUserId = userId;
 
         migrateStorageKey();
         const cached = storage.load(KEY);
