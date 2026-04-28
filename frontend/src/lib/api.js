@@ -7,6 +7,12 @@ function authHeaders() {
 }
 
 async function json(res) {
+  if (res.status === 401) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    window.location.href = "/login";
+    return;
+  }
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
     throw new Error(txt || `HTTP ${res.status}`);
