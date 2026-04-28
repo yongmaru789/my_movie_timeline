@@ -30,12 +30,15 @@ export default function NavBar() {
           <Item to="/" label="홈" />
           <Item to="/timeline" label="타임라인" />
           {state.user ? (
-            <button
-              onClick={handleLogout}
-              className="px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition"
-            >
-              로그아웃
-            </button>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">{state.user.username}님</span>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition"
+              >
+                로그아웃
+              </button>
+            </div>
           ) : (
             <Item to="/login" label="로그인" />
           )}
