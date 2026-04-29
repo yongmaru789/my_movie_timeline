@@ -11,6 +11,9 @@ const AppContext = createContext(null);
 const initialState = {
   user: null,
   movies: [],
+  totalPages: 0,
+  totalElements: 0,
+  currentPage: 0,
   loading: true,
   error: null,
 };
@@ -34,6 +37,8 @@ function reducer(state, action) {
       return { ...state, user: action.payload };
     case "LOGOUT":
       return { ...state, user: null, movies: [] };
+    case "SET_PAGE":
+      return { ...state, currentPage: action.payload };
     default:
       return state;
   }
@@ -95,10 +100,10 @@ export function AppProvider({ children }) {
         }
 
         try {
-          const { movies: remoteMovies = [] } = await Api.listMovies(currentUserId);
+          const { movies: remoteMovies = [], totalPages, totalElements } = await Api.listMovies(currentUserId, 0);
           const merged = mergeById(bootstrap.movies, remoteMovies);
           if (!cancelled) {
-            dispatch({ type: "INIT", payload: { user: { id: currentUserId }, movies: merged } });
+            dispatch({ type: "INIT", payload: { user: { id: currentUserId }, movies: merged, totalPages, totalElements } });
           }
           storage.save(KEY, { user: { id: currentUserId }, movies: merged });
         } catch {
@@ -183,6 +188,12 @@ export function AppProvider({ children }) {
       localStorage.removeItem("userId");
       storage.clear(KEY);
       dispatch({ type: "LOGOUT" });
+    },
+
+    async loadPage(page) {
+      const userId = state.user?.id;
+      const { movies, totalPages, totalElements } = await Api.listMovies(userId, page);
+      dispatch({ type: "INIT", payload: { movies, totalPages, totalElements, currentPage: page } });
     },
 
   };

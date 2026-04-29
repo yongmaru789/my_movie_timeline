@@ -25,13 +25,17 @@ export const Api = {
     return DEV_USER_ID;
   },
 
-  async listMovies(userId) {
-    const res = await fetch(`${BASE}/api/movies?userId=${userId}`, {
-      headers: { ...authHeaders() },
-    });
-    const body = await json(res);
-    return { movies: body.data };
-  },
+  async listMovies(userId, page = 0, size = 10) {
+  const res = await fetch(`${BASE}/api/movies?userId=${userId}&page=${page}&size=${size}`, {
+    headers: { ...authHeaders() },
+  });
+  const body = await json(res);
+  return { 
+    movies: body.data.content,
+    totalPages: body.data.totalPages,
+    totalElements: body.data.totalElements,
+  };
+},
 
   async createMovie(payload) {
     const res = await fetch(`${BASE}/api/movies`, {

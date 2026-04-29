@@ -1,6 +1,10 @@
 package com.mymovie.backend.movie;
 
 import com.mymovie.backend.ApiResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -15,8 +19,12 @@ public class MovieController {
     }
 
     @GetMapping
-    public ApiResponse<List<Movie>> getMoviesByUserId(@RequestParam String userId) {
-        return ApiResponse.ok(movieService.getMoviesByUserId(userId));
+    public ApiResponse<Page<Movie>> getMoviesByUserId(
+            @RequestParam String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        return ApiResponse.ok(movieService.getMoviesByUserId(userId, pageable));
     }
 
     @PostMapping

@@ -1,5 +1,7 @@
 package com.mymovie.backend.movie;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -12,8 +14,8 @@ public class MovieService {
         this.movieRepository = movieRepository;
     }
 
-    public List<Movie> getMoviesByUserId(String userId) {
-        return movieRepository.findByUserId(userId);
+    public Page<Movie> getMoviesByUserId(String userId, Pageable pageable) {
+        return movieRepository.findByUserId(userId, pageable);
     }
 
     public Movie addMovie(Movie movie) {

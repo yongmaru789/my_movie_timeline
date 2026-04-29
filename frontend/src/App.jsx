@@ -499,6 +499,37 @@ function App() {
             );
           })}
         </div>
+        {state.totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-8">
+            <button
+              onClick={() => actions.loadPage(state.currentPage - 1)}
+              disabled={state.currentPage === 0}
+              className="px-4 py-2 rounded-lg border bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-40"
+            >
+              이전
+            </button>
+            {Array.from({ length: state.totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => actions.loadPage(i)}
+                className={`px-4 py-2 rounded-lg border ${
+                  state.currentPage === i
+                    ? "bg-gray-800 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => actions.loadPage(state.currentPage + 1)}
+              disabled={state.currentPage === state.totalPages - 1}
+              className="px-4 py-2 rounded-lg border bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-40"
+            >
+              다음
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
