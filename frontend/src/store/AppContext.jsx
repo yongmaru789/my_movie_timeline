@@ -165,7 +165,8 @@ export function AppProvider({ children }) {
         body: JSON.stringify({ username, password }),
       });
       if (!res.ok) throw new Error("login failed");
-      const data = await res.json();  // { token, userId, username } 형태
+      const body = await res.json();  // { token, userId, username } 형태
+      const data = body.data;
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
       dispatch({ type: "LOGIN", payload: { id: data.userId, username: data.username } });

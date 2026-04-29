@@ -29,8 +29,8 @@ export const Api = {
     const res = await fetch(`${BASE}/api/movies?userId=${userId}`, {
       headers: { ...authHeaders() },
     });
-    const movies = await json(res);
-    return { movies };
+    const body = await json(res);
+    return { movies: body.data };
   },
 
   async createMovie(payload) {
@@ -39,8 +39,8 @@ export const Api = {
       headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(payload),
     });
-    const movie = await json(res);
-    return { movie };
+    const body = await json(res);
+    return { movie: body.data };
   },
 
   async updateMovie(id, payload) {
@@ -49,8 +49,8 @@ export const Api = {
       headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(payload),
     });
-    const movie = await json(res);
-    return { movie };
+    const body = await json(res);
+    return { movie: body.data };
   },
 
   async deleteMovie(id) {

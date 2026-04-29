@@ -13,13 +13,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MovieNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFound(MovieNotFoundException e) {
-        return Map.of("error", e.getMessage());
+    public ApiResponse<Void> handleNotFound(MovieNotFoundException e) {
+        return ApiResponse.fail(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleRuntimeException(RuntimeException e) {
-        return Map.of("error", e.getMessage());
+    public ApiResponse<Void> handleRuntimeException(RuntimeException e) {
+        return ApiResponse.fail(e.getMessage());
     }
 }

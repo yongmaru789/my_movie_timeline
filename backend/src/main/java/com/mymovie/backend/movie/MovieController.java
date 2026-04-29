@@ -1,5 +1,6 @@
 package com.mymovie.backend.movie;
 
+import com.mymovie.backend.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -14,22 +15,23 @@ public class MovieController {
     }
 
     @GetMapping
-    public List<Movie> getMoviesByUserId(@RequestParam String userId) {
-        return movieService.getMoviesByUserId(userId);
+    public ApiResponse<List<Movie>> getMoviesByUserId(@RequestParam String userId) {
+        return ApiResponse.ok(movieService.getMoviesByUserId(userId));
     }
 
     @PostMapping
-    public Movie addMovie(@RequestBody Movie movie) {
-        return movieService.addMovie(movie);
+    public ApiResponse<Movie> addMovie(@RequestBody Movie movie) {
+        return ApiResponse.ok(movieService.addMovie(movie));
     }
 
     @PutMapping("/{id}")
-    public Movie updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
-        return movieService.updateMovie(id, movie);
+    public ApiResponse<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
+        return ApiResponse.ok(movieService.updateMovie(id, movie));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteMovie(@PathVariable Long id) {
+    public ApiResponse<Void> deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);
+        return ApiResponse.ok(null);
     }
 }
