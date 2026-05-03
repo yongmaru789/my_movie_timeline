@@ -10,65 +10,80 @@ export const TMDB_IMG_BASE = "https://image.tmdb.org/t/p/w200";
 const TMDB_BEARER = import.meta.env.VITE_TMDB_BEARER?.trim();
 const TMDB_KEY = import.meta.env.VITE_TMDB_KEY?.trim();
 
-function clampRating(value) {
-  return Math.max(0, Math.min(5, Math.round(value * 2) / 2));
-}
-
-function StarIcon({ fillPercent = 0, size = 28 }) {
-  const starPath =
-    "M12 2.5l2.938 5.953 6.569.955-4.753 4.633 1.122 6.543L12 17.49l-5.876 3.094 1.122-6.543L2.493 9.408l6.569-.955L12 2.5z";
-
+function StarIcon({ fillPercent = 0, size = 28, onClickLeft, onClickRight, onHoverLeft, onHoverRight, onMouseLeave }) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} className="shrink-0">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      className="shrink-0 cursor-pointer"
+      onMouseLeave={onMouseLeave}
+    >
       <defs>
         <clipPath id={`clip-${size}-${fillPercent}`}>
           <rect x="0" y="0" width={`${fillPercent}%`} height="24" />
         </clipPath>
       </defs>
-
-      <path d={starPath} fill="#e5e7eb" stroke="#111827" strokeWidth="1.2" />
       <path
-        d={starPath}
+        d="M12 2.5l2.938 5.953 6.569.955-4.753 4.633 1.122 6.543L12 17.49l-5.876 3.094 1.122-6.543L2.493 9.408l6.569-.955L12 2.5z"
+        fill="#e5e7eb"
+        stroke="#111827"
+        strokeWidth="1.2"
+      />
+      <path
+        d="M12 2.5l2.938 5.953 6.569.955-4.753 4.633 1.122 6.543L12 17.49l-5.876 3.094 1.122-6.543L2.493 9.408l6.569-.955L12 2.5z"
         fill="#facc15"
         stroke="#111827"
         strokeWidth="1.2"
         clipPath={`url(#clip-${size}-${fillPercent})`}
       />
+      {/* 왼쪽 절반 - 0.5점 */}
+      <rect
+        x="0" y="0" width="12" height="24"
+        fill="transparent"
+        onMouseEnter={onHoverLeft}
+        onClick={onClickLeft}
+      />
+      {/* 오른쪽 절반 - 1점 */}
+      <rect
+        x="12" y="0" width="12" height="24"
+        fill="transparent"
+        onMouseEnter={onHoverRight}
+        onClick={onClickRight}
+      />
     </svg>
   );
 }
 
-function RatingStars({
-  value,
-  onChange,
-  interactive = false,
-  size = 28,
-  showText = true,
-}) {
-  const handleWheel = (e) => {
-    if (!interactive || !onChange) return;
-    e.preventDefault();
+function RatingStars({ value, onChange, interactive = false, size = 28, showText = true }) {
+  const [hoverValue, setHoverValue] = useState(null);
 
-    const next = e.deltaY < 0 ? value + 0.5 : value - 0.5;
-    onChange(clampRating(next));
-  };
+  const displayValue = hoverValue !== null ? hoverValue : value;
 
   return (
     <div className="flex items-center gap-3">
       <div
-        className={`${interactive ? "cursor-ns-resize select-none" : ""} flex items-center gap-1`}
-        onWheel={handleWheel}
-        title={interactive ? "마우스 휠로 0.5점 단위 조절" : ""}
+        className="flex items-center gap-1"
+        onMouseLeave={() => setHoverValue(null)}
       >
         {[1, 2, 3, 4, 5].map((starIndex) => {
           let fillPercent = 0;
-          if (value >= starIndex) fillPercent = 100;
-          else if (value >= starIndex - 0.5) fillPercent = 50;
+          if (displayValue >= starIndex) fillPercent = 100;
+          else if (displayValue >= starIndex - 0.5) fillPercent = 50;
 
-          return <StarIcon key={starIndex} fillPercent={fillPercent} size={size} />;
+          return (
+            <StarIcon
+              key={starIndex}
+              fillPercent={fillPercent}
+              size={size}
+              onHoverLeft={interactive ? () => setHoverValue(starIndex - 0.5) : undefined}
+              onHoverRight={interactive ? () => setHoverValue(starIndex) : undefined}
+              onClickLeft={interactive && onChange ? () => onChange(starIndex - 0.5) : undefined}
+              onClickRight={interactive && onChange ? () => onChange(starIndex) : undefined}
+            />
+          );
         })}
       </div>
-
       {showText && (
         <span className="text-sm font-medium text-gray-700 min-w-[3rem]">
           {value.toFixed(1)} / 5.0
@@ -336,7 +351,7 @@ function App() {
             <div className="mb-2 text-sm font-medium text-gray-700">별점</div>
             <RatingStars value={rating} onChange={setRating} interactive />
             <p className="mt-2 text-xs text-gray-500">
-              별 영역 위에서 마우스 휠을 올리면 +0.5점, 내리면 -0.5점입니다.
+              별의 왼쪽 절반을 클릭하면 0.5점, 오른쪽 절반을 클릭하면 1점입니다.
             </p>
           </div>
 
