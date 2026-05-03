@@ -193,9 +193,9 @@ export function AppProvider({ children }) {
       dispatch({ type: "LOGOUT" });
     },
 
-    async loadPage(page) {
+    async loadPage(page, sortBy = "date", direction = "desc") {
       const userId = state.user?.id;
-      const { movies, totalPages, totalElements } = await Api.listMovies(userId, page);
+      const { movies, totalPages, totalElements } = await Api.listMovies(userId, page, 10, sortBy, direction);
       dispatch({ type: "INIT", payload: { movies, totalPages, totalElements, currentPage: page } });
     },
 

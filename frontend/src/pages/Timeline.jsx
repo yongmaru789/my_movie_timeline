@@ -1,4 +1,6 @@
+import { useState, useEffect } from "react";
 import { useApp } from "../store/AppContext";
+import { Api } from "../lib/api";
 
 function groupByYearMonth(movies) {
   const groups = {};
@@ -17,12 +19,28 @@ const MONTH_KR = ["1월","2월","3월","4월","5월","6월","7월","8월","9월"
 
 export default function Timeline() {
   const { state } = useApp();
-  const { movies, loading } = state;
+  const [allMovies, setAllMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const userId = state.user?.id;
+    if (!userId) return;
+
+    (async () => {
+      try {
+        const { movies } = await Api.listAllMovies(userId);
+        setAllMovies(movies);
+      } catch {
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [state.user]);
 
   if (loading) return <div className="p-6">불러오는 중...</div>;
-  if (!movies.length) return <div className="p-6">아직 등록한 영화가 없습니다.</div>;
+  if (!allMovies.length) return <div className="p-6">아직 등록한 영화가 없습니다.</div>;
 
-  const groups = groupByYearMonth(movies);
+  const groups = groupByYearMonth(allMovies);
   const years = Object.keys(groups).sort((a, b) => b - a);
 
   return (

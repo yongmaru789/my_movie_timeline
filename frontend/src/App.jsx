@@ -209,12 +209,7 @@ function App() {
     setEditPoster("");
   };
 
-  const sortedMovies = [...movies].sort((a, b) => {
-    if (sortOrder === "newest") return new Date(b.date) - new Date(a.date);
-    return new Date(a.date) - new Date(b.date);
-  });
-
-  const filteredMovies = sortedMovies.filter((m) => {
+  const filteredMovies = movies.filter((m) => {
     const kw = searchKeyword.trim().toLowerCase();
     if (!kw) return true;
     const t = (m.title || "").toLowerCase();
@@ -385,22 +380,14 @@ function App() {
             onChange={(e) => setSearchKeyword(e.target.value)}
           />
           <Button
-            onClick={() => setSortOrder("newest")}
-            className={
-              sortOrder === "newest"
-                ? "bg-gray-200 text-black hover:bg-gray-300"
-                : "bg-white text-black hover:bg-gray-100"
-            }
+            onClick={() => { actions.loadPage(0, "date", "desc"); setSortOrder("newest"); }}
+            className={sortOrder === "newest" ? "bg-gray-200 text-black hover:bg-gray-300" : "bg-white text-black hover:bg-gray-100"}
           >
             최신순
           </Button>
           <Button
-            onClick={() => setSortOrder("oldest")}
-            className={
-              sortOrder === "oldest"
-                ? "bg-gray-200 text-black hover:bg-gray-300"
-                : "bg-white text-black hover:bg-gray-100"
-            }
+            onClick={() => { actions.loadPage(0, "date", "asc"); setSortOrder("oldest"); }}
+            className={sortOrder === "oldest" ? "bg-gray-200 text-black hover:bg-gray-300" : "bg-white text-black hover:bg-gray-100"}
           >
             오래된순
           </Button>

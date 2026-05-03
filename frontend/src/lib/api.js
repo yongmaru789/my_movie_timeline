@@ -25,17 +25,25 @@ export const Api = {
     return DEV_USER_ID;
   },
 
-  async listMovies(userId, page = 0, size = 10) {
-  const res = await fetch(`${BASE}/api/movies?userId=${userId}&page=${page}&size=${size}`, {
-    headers: { ...authHeaders() },
-  });
-  const body = await json(res);
-  return { 
-    movies: body.data.content,
-    totalPages: body.data.totalPages,
-    totalElements: body.data.totalElements,
-  };
-},
+  async listMovies(userId, page = 0, size = 10, sortBy = "date", direction = "desc") {
+    const res = await fetch(`${BASE}/api/movies?userId=${userId}&page=${page}&size=${size}&sortBy=${sortBy}&direction=${direction}`, {
+      headers: { ...authHeaders() },
+    });
+    const body = await json(res);
+    return { 
+      movies: body.data.content,
+      totalPages: body.data.totalPages,
+      totalElements: body.data.totalElements,
+    };
+  },
+
+  async listAllMovies(userId) {
+    const res = await fetch(`${BASE}/api/movies?userId=${userId}&page=0&size=9999`, {
+      headers: { ...authHeaders() },
+    });
+    const body = await json(res);
+    return { movies: body.data.content };
+  },
 
   async createMovie(payload) {
     const res = await fetch(`${BASE}/api/movies`, {
