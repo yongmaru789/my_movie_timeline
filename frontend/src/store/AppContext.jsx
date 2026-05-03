@@ -75,8 +75,9 @@ export function AppProvider({ children }) {
 
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
+    const username = localStorage.getItem("username");
     if (token && userId) {
-      dispatch({ type: "LOGIN", payload: { id: userId } });
+      dispatch({ type: "LOGIN", payload: { id: userId, username } });  // username 추가
     }
 
     let cancelled = false;
@@ -174,11 +175,12 @@ export function AppProvider({ children }) {
       const data = body.data;
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
+      localStorage.setItem("username", data.username);
       dispatch({ type: "LOGIN", payload: { id: data.userId, username: data.username } });
     
       try {
-        const {movies} = await Api.listMovies(String(data.userId));
-        dispatch({ type: "INIT", payload: {user : {id: String(data.userId), username: data.username}, movies } });
+        const { movies, totalPages, totalElements } = await Api.listMovies(String(data.userId), 0);
+        dispatch({ type: "INIT", payload: { user: { id: String(data.userId), username: data.username }, movies, totalPages, totalElements } });
       } catch {
       }
     },
@@ -186,6 +188,7 @@ export function AppProvider({ children }) {
     logout() {
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
+      localStorage.removeItem("username");
       storage.clear(KEY);
       dispatch({ type: "LOGOUT" });
     },

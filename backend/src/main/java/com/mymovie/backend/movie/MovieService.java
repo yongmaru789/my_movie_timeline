@@ -28,7 +28,7 @@ public class MovieService {
         movie.setRating(updated.getRating());
         movie.setMemo(updated.getMemo());
         movie.setWatchedDate(updated.getWatchedDate());
-        movie.setDate(updated.getPoster());
+        movie.setDate(updated.getDate());
         movie.setPoster(updated.getPoster());
         movie.setGenres(updated.getGenres());
         return movieRepository.save(movie);
