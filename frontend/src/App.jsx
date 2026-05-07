@@ -3,6 +3,7 @@ import "./App.css";
 import { useApp } from "./store/AppContext";
 import { Button, Input } from "./components/UiPrimitives";
 import Card from "./components/Card";
+import { Api } from "./lib/api";
 
 const TMDB_BASE = "https://api.themoviedb.org/3";
 export const TMDB_IMG_BASE = "https://image.tmdb.org/t/p/w200";
@@ -209,7 +210,24 @@ function App() {
     setEditPoster("");
   };
 
-  const filteredMovies = movies.filter((m) => {
+  const [allMoviesForSearch, setAllMoviesForSearch] = useState([]);
+  useEffect(() => {
+    if (!searchKeyword.trim()) {
+      setAllMoviesForSearch([]);
+      return;
+    }
+    const userId = state.user?.id;
+    if (!userId) return;
+    (async () => {
+      try {
+        const { movies: all } = await Api.listAllMovies(userId);
+        setAllMoviesForSearch(all);
+      } catch {}
+    })();
+  }, [searchKeyword, state.user]);
+
+  const sourceMovies = searchKeyword.trim() ? allMoviesForSearch : movies;
+  const filteredMovies = sourceMovies.filter((m) => {
     const kw = searchKeyword.trim().toLowerCase();
     if (!kw) return true;
     const t = (m.title || "").toLowerCase();
