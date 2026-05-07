@@ -535,7 +535,7 @@ function App() {
         {state.totalPages > 1 && (
           <div className="flex items-center justify-center gap-2 mt-8">
             <button
-              onClick={() => actions.loadPage(state.currentPage - 1)}
+              onClick={() => actions.loadPage(state.currentPage - 1, "date", sortOrder === "newest" ? "desc" : "asc")}
               disabled={state.currentPage === 0}
               className="px-4 py-2 rounded-2xl text-sm font-semibold border border-sky-100 bg-white disabled:opacity-40 transition hover:bg-sky-50"
               style={{color: "#3D8FE0"}}
@@ -545,7 +545,7 @@ function App() {
             {Array.from({ length: state.totalPages }, (_, i) => (
               <button
                 key={i}
-                onClick={() => actions.loadPage(i)}
+                onClick={() => actions.loadPage(i, "date", sortOrder === "newest" ? "desc" : "asc")}
                 className="px-4 py-2 rounded-2xl text-sm font-semibold transition"
                 style={state.currentPage === i
                   ? {background: "#3D8FE0", color: "white"}
@@ -555,7 +555,7 @@ function App() {
               </button>
             ))}
             <button
-              onClick={() => actions.loadPage(state.currentPage + 1)}
+              onClick={() => actions.loadPage(state.currentPage + 1, "date", sortOrder === "newest" ? "desc" : "asc")}
               disabled={state.currentPage === state.totalPages - 1}
               className="px-4 py-2 rounded-2xl text-sm font-semibold border border-sky-100 bg-white disabled:opacity-40 transition hover:bg-sky-50"
               style={{color: "#3D8FE0"}}
