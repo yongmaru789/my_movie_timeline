@@ -285,115 +285,142 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{background: "#F0F8FF"}}>
       <div className="mx-auto w-full max-w-screen-2xl p-4 sm:p-6 lg:p-8">
-        <h1 className="text-2xl font-bold mb-4">인생 영화 타임라인</h1>
+        <h1 className="text-2xl font-bold mb-6 flex items-center gap-3" style={{color: "#1A5FA0"}}>
+          <i className="fa-solid fa-clapperboard" style={{color: "#5BAAEE"}}></i>
+          인생 영화 타임라인
+        </h1>
 
-        <form onSubmit={handleSubmit} className="form space-y-3 mb-6" autoComplete="off">
-          <div className="flex flex-col gap-4">
-            <Input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="sm:w-40"
-            />
-            <div className="title-autocomplete" ref={dropdownRef}>
-              <Input
-                type="text"
-                placeholder="영화 제목"
-                value={title}
-                onChange={handleTitleChange}
-                onFocus={() => setShowDropdown(!!title.trim())}
+        <div className="bg-white rounded-3xl p-6 mb-6 shadow-sm border border-sky-100">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+            <div className="flex flex-col gap-4">
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-40 rounded-2xl px-4 py-2 text-sm border border-sky-100 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                style={{background: "#F0F8FF", color: "#1A5FA0"}}
               />
-              {showDropdown && (
-                <div className="ac-panel">
-                  {tmdbLoading && <div className="ac-item muted">검색 중</div>}
-                  {tmdbError && <div className="ac-item error">{tmdbError}</div>}
-                  {!tmdbLoading && !tmdbError && tmdbResults.length === 0 && (
-                    <div className="ac-item muted">검색 결과가 없습니다.</div>
-                  )}
-                  {tmdbResults.map((it) => (
-                    <button
-                      type="button"
-                      key={`${it.id}-${it.release_date}`}
-                      className="ac-item border border-black bg-white hover:bg-gray-50"
-                      onClick={() => handlePickSuggestion(it)}
-                    >
-                      <div className="ac-thumb">
-                        {it.poster_path ? (
-                          <img src={`${TMDB_IMG_BASE}${it.poster_path}`} alt="" />
-                        ) : (
-                          <div className="no-thumb">NO</div>
-                        )}
-                      </div>
-                      <div className="ac-meta">
-                        <div className="ac-title">{it.title || it.name}</div>
-                        <div className="ac-sub">
-                          {it.release_date ? it.release_date.slice(0, 4) : "—"}
-                          {it.original_title && it.original_title !== it.title
-                            ? ` · ${it.original_title}`
-                            : ""}
+              <div className="title-autocomplete" ref={dropdownRef}>
+                <input
+                  type="text"
+                  placeholder="🎬 영화 제목 검색..."
+                  value={title}
+                  onChange={handleTitleChange}
+                  onFocus={() => setShowDropdown(!!title.trim())}
+                  className="w-full rounded-2xl px-4 py-2 text-sm border border-sky-100 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                  style={{background: "#F0F8FF", color: "#1A5FA0"}}
+                />
+                {showDropdown && (
+                  <div className="ac-panel">
+                    {tmdbLoading && <div className="ac-item muted">검색 중</div>}
+                    {tmdbError && <div className="ac-item error">{tmdbError}</div>}
+                    {!tmdbLoading && !tmdbError && tmdbResults.length === 0 && (
+                      <div className="ac-item muted">검색 결과가 없습니다.</div>
+                    )}
+                    {tmdbResults.map((it) => (
+                      <button
+                        type="button"
+                        key={`${it.id}-${it.release_date}`}
+                        className="ac-item border border-sky-100 bg-white hover:bg-sky-50"
+                        onClick={() => handlePickSuggestion(it)}
+                      >
+                        <div className="ac-thumb">
+                          {it.poster_path ? (
+                            <img src={`${TMDB_IMG_BASE}${it.poster_path}`} alt="" />
+                          ) : (
+                            <div className="no-thumb">NO</div>
+                          )}
                         </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+                        <div className="ac-meta">
+                          <div className="ac-title" style={{color: "#1A5FA0"}}>{it.title || it.name}</div>
+                          <div className="ac-sub">
+                            {it.release_date ? it.release_date.slice(0, 4) : "—"}
+                            {it.original_title && it.original_title !== it.title
+                              ? ` · ${it.original_title}`
+                              : ""}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="rounded-xl border border-gray-300 bg-white px-4 py-3">
-            <div className="mb-2 text-sm font-medium text-gray-700">별점</div>
-            <RatingStars value={rating} onChange={setRating} interactive />
-            <p className="mt-2 text-xs text-gray-500">
-              별의 왼쪽 절반을 클릭하면 0.5점, 오른쪽 절반을 클릭하면 1점입니다.
-            </p>
-          </div>
+            <div className="rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3">
+              <div className="mb-2 text-sm font-semibold" style={{color: "#5BAAEE"}}>별점</div>
+              <RatingStars value={rating} onChange={setRating} interactive />
+              <p className="mt-2 text-xs" style={{color: "#93C5E8"}}>
+                별의 왼쪽 절반을 클릭하면 0.5점, 오른쪽 절반을 클릭하면 1점입니다.
+              </p>
+            </div>
 
-          <Input
-            type="text"
-            placeholder="포스터 이미지 URL"
-            value={poster}
-            onChange={(e) => setPoster(e.target.value)}
-          />
-          {poster.trim() && (
-            <img
-              src={poster}
-              alt="포스터 미리보기"
-              className="h-36 w-auto rounded-lg border border-gray-200"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
+            <input
+              type="text"
+              placeholder="포스터 이미지 URL"
+              value={poster}
+              onChange={(e) => setPoster(e.target.value)}
+              className="w-full rounded-2xl px-4 py-2 text-sm border border-sky-100 focus:outline-none focus:ring-2 focus:ring-sky-200"
+              style={{background: "#F0F8FF", color: "#1A5FA0"}}
             />
-          )}
-          <Button className="bg-gray-100 text-black hover:bg-gray-200">
-            등록
-          </Button>
-        </form>
-
-        <div className="flex items-center gap-2 mb-4">
-          <Input
-            className="flex-1"
-            type="text"
-            placeholder="제목/장르/별점 검색"
-            value={searchKeyword}
-            onChange={(e) => setSearchKeyword(e.target.value)}
-          />
-          <Button
-            onClick={() => { actions.loadPage(0, "date", "desc"); setSortOrder("newest"); }}
-            className={sortOrder === "newest" ? "bg-gray-200 text-black hover:bg-gray-300" : "bg-white text-black hover:bg-gray-100"}
-          >
-            최신순
-          </Button>
-          <Button
-            onClick={() => { actions.loadPage(0, "date", "asc"); setSortOrder("oldest"); }}
-            className={sortOrder === "oldest" ? "bg-gray-200 text-black hover:bg-gray-300" : "bg-white text-black hover:bg-gray-100"}
-          >
-            오래된순
-          </Button>
+            {poster.trim() && (
+              <img
+                src={poster}
+                alt="포스터 미리보기"
+                className="h-36 w-auto rounded-2xl border border-sky-100"
+                onError={(e) => { e.currentTarget.style.display = "none"; }}
+              />
+            )}
+            <button
+              type="submit"
+              className="flex items-center gap-2 px-6 py-2 rounded-2xl text-sm font-semibold text-white transition hover:opacity-90"
+              style={{background: "linear-gradient(135deg, #5BAAEE, #3D8FE0)"}}
+            >
+              <i className="fa-solid fa-plus"></i> 등록하기
+            </button>
+          </form>
         </div>
 
-        {filteredMovies.length === 0 && <div className="empty">아직 등록한 영화가 없습니다.</div>}
+        <div className="flex items-center gap-2 mb-6">
+          <div className="relative flex-1">
+            <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-sky-300"></i>
+            <input
+              type="text"
+              placeholder="제목 / 장르 / 별점 검색"
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-2xl text-sm border border-sky-100 focus:outline-none focus:ring-2 focus:ring-sky-200 bg-white"
+              style={{color: "#1A5FA0"}}
+            />
+          </div>
+          <button
+            onClick={() => { actions.loadPage(0, "date", "desc"); setSortOrder("newest"); }}
+            className="flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-semibold transition"
+            style={sortOrder === "newest"
+              ? {background: "#3D8FE0", color: "white"}
+              : {background: "white", color: "#3D8FE0", border: "1.5px solid #C8E4FF"}}
+          >
+            <i className="fa-solid fa-arrow-down-wide-short"></i> 최신순
+          </button>
+          <button
+            onClick={() => { actions.loadPage(0, "date", "asc"); setSortOrder("oldest"); }}
+            className="flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-semibold transition"
+            style={sortOrder === "oldest"
+              ? {background: "#3D8FE0", color: "white"}
+              : {background: "white", color: "#3D8FE0", border: "1.5px solid #C8E4FF"}}
+          >
+            <i className="fa-solid fa-arrow-up-wide-short"></i> 오래된순
+          </button>
+        </div>
+
+        {filteredMovies.length === 0 && (
+          <div className="text-center py-16 text-sky-300">
+            <i className="fa-solid fa-film text-4xl mb-4 block"></i>
+            아직 등록한 영화가 없습니다.
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredMovies.map((movie) => {
@@ -402,45 +429,33 @@ function App() {
             const isEditing = editId && id && editId === id;
 
             return (
-              <Card key={id || originalIndex}>
-                <div className={`p-4 flex gap-4 ${isEditing ? "bg-blue-50" : ""}`}>
+              <div key={id || originalIndex} className="bg-white rounded-3xl overflow-hidden border border-sky-100 shadow-sm hover:shadow-md transition-shadow">
+                <div className={`p-4 flex gap-4 ${isEditing ? "bg-sky-50" : ""}`}>
                   <div className="w-24 shrink-0">
                     {isEditing ? (
                       editPoster ? (
-                        <img
-                          src={editPoster}
-                          alt="포스터 미리보기"
-                          className="h-36 w-auto rounded-lg border"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
+                        <img src={editPoster} alt="포스터 미리보기" className="h-36 w-auto rounded-2xl border border-sky-100"
+                          onError={(e) => { e.currentTarget.style.display = "none"; }} />
                       ) : null
                     ) : movie.poster ? (
-                      <img
-                        src={movie.poster}
-                        alt={`${movie.title} 포스터`}
-                        className="h-36 w-auto rounded-lg border"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
+                      <img src={movie.poster} alt={`${movie.title} 포스터`} className="h-36 w-auto rounded-2xl border border-sky-100"
+                        onError={(e) => { e.currentTarget.style.display = "none"; }} />
                     ) : (
-                      <div className="h-36 rounded-lg bg-gray-100" />
+                      <div className="h-36 rounded-2xl flex items-center justify-center text-3xl" style={{background: "#EBF5FF"}}>🎬</div>
                     )}
                   </div>
 
                   <div className="flex-1">
-                    <div className="text-sm text-gray-500">{movie.date}</div>
-                    <div className="text-lg font-semibold">{movie.title}</div>
+                    <div className="text-xs mb-1 flex items-center gap-1" style={{color: "#93C5E8"}}>
+                      <i className="fa-regular fa-calendar-days"></i>
+                      {movie.date}
+                    </div>
+                    <div className="text-base font-bold mb-2" style={{color: "#1A5FA0"}}>{movie.title}</div>
 
                     {Array.isArray(movie.genres) && movie.genres.length > 0 && (
-                      <div className="mt-1 flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-1 mb-2">
                         {movie.genres.map((g) => (
-                          <span
-                            key={g}
-                            className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-xs border"
-                          >
+                          <span key={g} className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{background: "#EBF5FF", color: "#3D8FE0"}}>
                             {g}
                           </span>
                         ))}
@@ -448,77 +463,75 @@ function App() {
                     )}
 
                     {movie.rating != null && (
-                      <div className="mt-2">
-                        <RatingStars value={movie.rating} size={20} showText />
+                      <div className="mb-3">
+                        <RatingStars value={movie.rating} size={18} showText />
                       </div>
                     )}
 
                     {isEditing ? (
-                      <div className="mt-3 space-y-2">
-                        <Input
-                          value={editTitle}
-                          onChange={(e) => setEditTitle(e.target.value)}
-                          placeholder="제목"
-                        />
-                        <div className="rounded-xl border border-gray-300 bg-white px-3 py-3">
-                          <div className="mb-2 text-sm font-medium text-gray-700">별점 수정</div>
-                          <RatingStars value={editRating} onChange={setEditRating} interactive />
+                      <div className="mt-2 space-y-2">
+                        <input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} placeholder="제목"
+                          className="w-full rounded-2xl px-3 py-2 text-sm border border-sky-100 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                          style={{background: "#F0F8FF", color: "#1A5FA0"}} />
+                        <div className="rounded-2xl border border-sky-100 bg-sky-50 px-3 py-3">
+                          <div className="mb-2 text-xs font-semibold" style={{color: "#5BAAEE"}}>별점 수정</div>
+                          <RatingStars value={editRating} onChange={setEditRating} interactive size={18} />
                         </div>
-                        <Input
-                          value={editPoster}
-                          onChange={(e) => setEditPoster(e.target.value)}
-                          placeholder="포스터 이미지 URL"
-                        />
+                        <input value={editPoster} onChange={(e) => setEditPoster(e.target.value)} placeholder="포스터 URL"
+                          className="w-full rounded-2xl px-3 py-2 text-sm border border-sky-100 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                          style={{background: "#F0F8FF", color: "#1A5FA0"}} />
                         <div className="flex gap-2">
-                          <Button
-                            onClick={() => handleUpdate(id)}
-                            className="bg-blue-600 text-white hover:bg-blue-700"
-                          >
-                            저장
-                          </Button>
-                          <Button onClick={() => setEditId(null)}>취소</Button>
+                          <button onClick={() => handleUpdate(id)}
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-2xl text-xs font-semibold text-white"
+                            style={{background: "#3D8FE0"}}>
+                            <i className="fa-solid fa-check"></i> 저장
+                          </button>
+                          <button onClick={() => setEditId(null)}
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-2xl text-xs font-semibold border border-sky-100"
+                            style={{color: "#93C5E8"}}>
+                            취소
+                          </button>
                         </div>
                       </div>
                     ) : (
-                      <>
-                        <div className="mt-3 flex gap-2">
-                          <Button onClick={() => id && startEdit(id)} disabled={!id}>
-                            수정
-                          </Button>
-                          <Button
-                            onClick={() => id && handleDelete(id)}
-                            disabled={!id}
-                            className="text-red-500 bg-white hover:bg-red-50"
-                          >
-                            삭제
-                          </Button>
-                        </div>
-                      </>
+                      <div className="flex gap-2">
+                        <button onClick={() => id && startEdit(id)} disabled={!id}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-2xl text-xs font-semibold border border-sky-100 transition hover:bg-sky-50"
+                          style={{color: "#3D8FE0", background: "#F0F8FF"}}>
+                          <i className="fa-solid fa-pen"></i> 수정
+                        </button>
+                        <button onClick={() => id && handleDelete(id)} disabled={!id}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-2xl text-xs font-semibold border transition hover:bg-red-50"
+                          style={{color: "#E07C7C", background: "#FFF5F5", borderColor: "#FFE4E4"}}>
+                          <i className="fa-solid fa-trash"></i> 삭제
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
+
         {state.totalPages > 1 && (
           <div className="flex items-center justify-center gap-2 mt-8">
             <button
               onClick={() => actions.loadPage(state.currentPage - 1)}
               disabled={state.currentPage === 0}
-              className="px-4 py-2 rounded-lg border bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-40"
+              className="px-4 py-2 rounded-2xl text-sm font-semibold border border-sky-100 bg-white disabled:opacity-40 transition hover:bg-sky-50"
+              style={{color: "#3D8FE0"}}
             >
-              이전
+              <i className="fa-solid fa-chevron-left"></i> 이전
             </button>
             {Array.from({ length: state.totalPages }, (_, i) => (
               <button
                 key={i}
                 onClick={() => actions.loadPage(i)}
-                className={`px-4 py-2 rounded-lg border ${
-                  state.currentPage === i
-                    ? "bg-gray-800 text-white"
-                    : "bg-white text-gray-600 hover:bg-gray-100"
-                }`}
+                className="px-4 py-2 rounded-2xl text-sm font-semibold transition"
+                style={state.currentPage === i
+                  ? {background: "#3D8FE0", color: "white"}
+                  : {background: "white", color: "#3D8FE0", border: "1.5px solid #C8E4FF"}}
               >
                 {i + 1}
               </button>
@@ -526,9 +539,10 @@ function App() {
             <button
               onClick={() => actions.loadPage(state.currentPage + 1)}
               disabled={state.currentPage === state.totalPages - 1}
-              className="px-4 py-2 rounded-lg border bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-40"
+              className="px-4 py-2 rounded-2xl text-sm font-semibold border border-sky-100 bg-white disabled:opacity-40 transition hover:bg-sky-50"
+              style={{color: "#3D8FE0"}}
             >
-              다음
+              다음 <i className="fa-solid fa-chevron-right"></i>
             </button>
           </div>
         )}
