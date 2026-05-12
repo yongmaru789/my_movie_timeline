@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useApp } from "../store/AppContext";
+import ReactMarkdown from "react-markdown";
 
 export default function Recommend() {
     const { state } = useApp();
@@ -37,8 +38,8 @@ export default function Recommend() {
                 {loading ? "추천 받는 중..." : "내 취향 분석해서 추천받기"}
             </button>
             {result && (
-                <div className="mt-8 bg-white p-6 rounded-xl shadow">
-                    <pre className="whitespace-pre-wrap text-gray-700">{result}</pre>
+                <div className="mt-8 bg-white p-6 rounded-xl shadow prose max-w-none">
+                    <ReactMarkdown>{result}</ReactMarkdown>
                 </div>
             )}
         </div>
