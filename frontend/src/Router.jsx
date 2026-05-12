@@ -5,6 +5,7 @@ import Timeline from "./pages/Timeline";
 import NavBar from "./components/NavBar";
 import Register from "./pages/Register";
 import PrivateRoute from "./components/PrivateRoute";
+import Recommend from "./pages/Recommend";
 
 export default function RouterRoot() {
   return (
@@ -15,6 +16,7 @@ export default function RouterRoot() {
         <Route path="/timeline" element={<PrivateRoute><Timeline /></PrivateRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/recommend" element={<PrivateRoute><Recommend /></PrivateRoute>} />
       </Routes>
     </BrowserRouter>
   );

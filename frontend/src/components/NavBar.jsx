@@ -37,6 +37,7 @@ export default function NavBar() {
           <div className="flex items-center gap-2">
             <Item to="/" label="홈" icon="fa-solid fa-house" />
             <Item to="/timeline" label="타임라인" icon="fa-solid fa-timeline" />
+            <Item to="/recommend" label="추천" icon="fa-solid fa-star" />
             {state.user ? (
               <div className="flex items-center gap-2">
                 <span className="flex items-center gap-2 text-sm text-sky-500 font-semibold bg-sky-50 px-4 py-2 rounded-full">
