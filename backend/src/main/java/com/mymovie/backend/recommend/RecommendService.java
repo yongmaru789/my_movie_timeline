@@ -30,13 +30,22 @@ public class RecommendService {
                 .collect(Collectors.joining("\n"));
 
         String prompt = """
-                다음은 내가 최근에 보고 높은 별점을 준 영화 목록이야:
-                
-                %s
-                
-                이 취향을 바탕으로 내가 좋아할 만한 영화 5편을 추천해줘.
-                각 영화마다 제목과 추천 이유를 간단히 설명해줘.
-                """.formatted(movieSummary);
+        다음은 내가 최근에 보고 높은 별점을 준 영화 목록이야:
+        
+        %s
+        
+        이 취향을 바탕으로 내가 좋아할 만한 영화 5편을 추천해줘.
+        반드시 아래 JSON 형식으로만 응답해줘. 다른 텍스트는 절대 포함하지 마.
+        
+        [
+          {
+            "title": "영화 제목",
+            "year": "개봉연도",
+            "genres": "장르1 · 장르2",
+            "reason": "추천 이유 한두 문장"
+          }
+        ]
+        """.formatted(movieSummary);
 
         try {
             String requestBody = """
