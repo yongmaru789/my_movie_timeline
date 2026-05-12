@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     Page<Movie> findByUserId(String userId, Pageable pageable);
+    List<Movie> findAllByUserId(String userId);
 }
