@@ -28,6 +28,9 @@ public class RecommendService {
                         m.getGenres() != null ? String.join(", ", m.getGenres()) : "없음",
                         m.getMemo() != null ? m.getMemo() : "없음"))
                 .collect(Collectors.joining("\n"));
+        if (movieSummary.isBlank()) {
+            return "별점 4점 이상인 영화가 없어서 추천을 드리기 어렵습니다.";
+        }
 
         String prompt = """
         다음은 내가 최근에 보고 높은 별점을 준 영화 목록이야:

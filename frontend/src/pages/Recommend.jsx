@@ -19,8 +19,14 @@ export default function Recommend() {
                 }
             );
             const data = await response.json();
-            const parsed = JSON.parse(data.data);
-            setMovies(parsed);
+
+            try {
+                const parsed = JSON.parse(data.data);
+                setMovies(parsed);
+            } catch {
+                setMovies(null);
+                alert(data.data); // "별점 4점 이상인 영화가 없습니다..." 메시지 표시
+            }
         } catch (e) {
             alert("추천을 불러오는 중 오류가 발생했습니다.");
         } finally {
