@@ -3,7 +3,10 @@ import { useApp } from "../store/AppContext";
 
 export default function Recommend() {
     const { state } = useApp();
-    const [movies, setMovies] = useState(null);
+    const [movies, setMovies] = useState(() => {
+        const saved = localStorage.getItem("recommendResult");
+        return saved ? JSON.parse(saved) : null;
+    });
     const [loading, setLoading] = useState(false);
     const [taste, setTaste] = useState(null);
 
@@ -23,6 +26,7 @@ export default function Recommend() {
             try {
                 const parsed = JSON.parse(data.data);
                 setMovies(parsed);
+                localStorage.setItem("recommendResult", JSON.stringify(parsed));
             } catch {
                 setMovies(null);
                 alert(data.data); // "별점 4점 이상인 영화가 없습니다..." 메시지 표시
