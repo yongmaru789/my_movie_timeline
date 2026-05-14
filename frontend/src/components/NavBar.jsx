@@ -42,7 +42,7 @@ export default function NavBar() {
               <div className="flex items-center gap-2">
                 <span className="flex items-center gap-2 text-sm text-sky-500 font-semibold bg-sky-50 px-4 py-2 rounded-full">
                   <i className="fa-solid fa-user-circle"></i>
-                  {state.user.username}님
+                  {state.user.username || localStorage.getItem("username")}님
                 </span>
                 <button
                   onClick={handleLogout}
