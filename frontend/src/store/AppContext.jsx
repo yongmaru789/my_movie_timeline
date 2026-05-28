@@ -130,12 +130,14 @@ export function AppProvider({ children }) {
         dispatch({ type: "ADD", payload: movie });
         const snapshot = { user: state.user || { id: userId }, movies: [movie, ...state.movies] };
         storage.save(KEY, snapshot);
+        localStorage.removeItem("recommendResult");
         return movie;
       } catch {
         const localMovie = { ...input, id: genLocalId(), userId };
         dispatch({ type: "ADD", payload: localMovie });
         const snapshot = { user: state.user || { id: userId }, movies: [localMovie, ...state.movies] };
         storage.save(KEY, snapshot);
+        localStorage.removeItem("recommendResult");
         return localMovie;
       }
     },
@@ -158,9 +160,11 @@ export function AppProvider({ children }) {
         await Api.deleteMovie(id);
         dispatch({ type: "DELETE", payload: id });
         storage.save(KEY, { user: state.user, movies: next });
+        localStorage.removeItem("recommendResult");
       } catch {
         dispatch({ type: "DELETE", payload: id });
         storage.save(KEY, { user: state.user, movies: next });
+        localStorage.removeItem("recommendResult");
       }
     },
 
