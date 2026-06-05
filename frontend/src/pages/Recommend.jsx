@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useApp } from "../store/AppContext";
 
+const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
+
 export default function Recommend() {
     const { state } = useApp();
     const [movies, setMovies] = useState(() => {
@@ -14,7 +16,7 @@ export default function Recommend() {
         setLoading(true);
         try {
             const response = await fetch(
-                `http://localhost:8080/api/recommend?userId=${state.user.id}`,
+                `${BASE}/api/recommend?userId=${state.user.id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
