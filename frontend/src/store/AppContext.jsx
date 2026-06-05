@@ -169,7 +169,8 @@ export function AppProvider({ children }) {
     },
 
     async login(username, password) {
-      const res = await fetch("http://localhost:8080/api/auth/login", {
+      const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
+      const res = await fetch(`${BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
