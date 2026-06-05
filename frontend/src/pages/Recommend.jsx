@@ -23,6 +23,13 @@ export default function Recommend() {
             );
             const data = await response.json();
 
+            // 추천 기능 비활성화 체크 추가
+            if (data.data === "추천 기능이 현재 비활성화되어 있습니다.") {
+                alert("추천 기능이 현재 비활성화되어 있습니다.");
+                setLoading(false);
+                return;
+            }
+
             try {
                 const parsed = JSON.parse(data.data);
                 setMovies(parsed);
