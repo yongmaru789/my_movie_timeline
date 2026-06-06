@@ -23,6 +23,11 @@ Spring Boot 백엔드 학습을 목적으로 개발한 학습용 프로젝트입
 - TMDB API (영화 검색)
 - Claude API (AI 영화 추천)
 
+**Deployment**
+- Frontend: Vercel
+- Backend: Railway
+- Database: Railway MySQL
+
 ---   
 
 ## 주요 기능
@@ -51,6 +56,7 @@ Spring Boot 백엔드 학습을 목적으로 개발한 학습용 프로젝트입
 - 별점 4점 이상 준 영화를 기반으로 취향 분석
 - Claude API를 활용한 맞춤 영화 5편 추천
 - 추천 결과를 제목 / 개봉연도 / 장르 / 추천 이유 카드 형태로 표시
+- 추천 기능 on/off 환경변수 플래그 지원 (`recommend.enabled`)
 
 ---
 
@@ -92,3 +98,38 @@ my_movie_timeline/
 | GET | `/api/recommend` | AI 영화 추천 (userId 기반) |
  
 ---
+
+## 환경변수
+
+**Frontend (`.env`)**
+| 변수명 | 설명 |
+|--------|------|
+| `VITE_API_BASE` | 백엔드 API 주소 |
+| `VITE_TMDB_KEY` | TMDB API 키 |
+| `VITE_TMDB_BEARER` | TMDB Bearer 토큰 |
+
+**Backend (`application.properties`)**
+| 변수명 | 설명 |
+|--------|------|
+| `spring.datasource.url` | DB 연결 URL |
+| `spring.datasource.username` | DB 사용자명 |
+| `spring.datasource.password` | DB 비밀번호 |
+| `claude.api.key` | Claude API 키 |
+| `recommend.enabled` | AI 추천 기능 on/off (true/false) |
+
+---
+
+## 로컬 실행 방법
+
+**Backend**
+```bash
+cd backend
+./gradlew bootRun
+```
+
+**Frontend**
+```bash
+cd frontend
+npm install
+npm run dev
+```
