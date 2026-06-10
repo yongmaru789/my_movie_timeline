@@ -26,8 +26,6 @@ public class MovieService {
         Movie movie = movieRepository.findById(id).orElseThrow(() -> new MovieNotFoundException(id));
         movie.setTitle(updated.getTitle());
         movie.setRating(updated.getRating());
-        movie.setMemo(updated.getMemo());
-        movie.setWatchedDate(updated.getWatchedDate());
         movie.setDate(updated.getDate());
         movie.setPoster(updated.getPoster());
         movie.setGenres(updated.getGenres());

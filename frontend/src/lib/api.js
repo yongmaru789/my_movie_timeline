@@ -1,5 +1,4 @@
 const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
-const DEV_USER_ID = import.meta.env.VITE_DEV_USER_ID || "dev-user-1";
 
 function authHeaders() {
   const token = localStorage.getItem("token");
@@ -21,10 +20,7 @@ async function json(res) {
 }
 
 export const Api = {
-  devUserId() {
-    return DEV_USER_ID;
-  },
-
+  
   async listMovies(userId, page = 0, size = 10, sortBy = "date", direction = "desc") {
     const res = await fetch(`${BASE}/api/movies?userId=${userId}&page=${page}&size=${size}&sortBy=${sortBy}&direction=${direction}`, {
       headers: { ...authHeaders() },

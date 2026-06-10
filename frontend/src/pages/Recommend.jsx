@@ -10,7 +10,6 @@ export default function Recommend() {
         return saved ? JSON.parse(saved) : null;
     });
     const [loading, setLoading] = useState(false);
-    const [taste, setTaste] = useState(null);
 
     const handleRecommend = async () => {
         setLoading(true);

@@ -16,8 +16,6 @@ public class Movie {
 
     private String title;
     private double rating;
-    private String memo;
-    private String watchedDate;
     private String date;
     private String poster;
     private String userId;
@@ -74,22 +72,6 @@ public class Movie {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getMemo() {
-        return memo;
-    }
-
-    public void setMemo(String memo) {
-        this.memo = memo;
-    }
-
-    public String getWatchedDate() {
-        return watchedDate;
-    }
-
-    public void setWatchedDate(String watchedDate) {
-        this.watchedDate = watchedDate;
     }
 
     public String getDate() {

@@ -5,7 +5,7 @@ import { Api } from "../lib/api";
 function groupByYearMonth(movies) {
   const groups = {};
   for (const movie of movies) {
-    const date = movie.watchedDate || movie.date;
+    const date = movie.date;
     if (!date) continue;
     const [year, month] = date.split("-");
     if (!groups[year]) groups[year] = {};
@@ -92,7 +92,7 @@ export default function Timeline() {
                         <p className="font-bold truncate" style={{color: "#1A5FA0"}}>{movie.title}</p>
                         <p className="text-xs mt-0.5 flex items-center gap-1" style={{color: "#93C5E8"}}>
                           <i className="fa-regular fa-calendar-days"></i>
-                          {movie.watchedDate || movie.date}
+                          {movie.date}
                         </p>
                         <p className="text-sm mt-1" style={{color: "#FFB347"}}>
                           {"★".repeat(Math.round(movie.rating))}{"☆".repeat(5 - Math.round(movie.rating))}

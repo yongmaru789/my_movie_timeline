@@ -4,7 +4,6 @@ import * as storage from "./storageAdapter";
 
 
 const KEY = "movie_timeline_state_v2";
-const LEGACY_KEYS = ["movie-timeline/state-v2", "movie_timeline_state_v1", "movie-timeline/state-v1"];
 
 const AppContext = createContext(null);
 
@@ -44,29 +43,12 @@ function reducer(state, action) {
   }
 }
 
-function migrateStorageKey() {
-  const hasNew = storage.load(KEY);
-  if (!hasNew) {
-    for (const k of LEGACY_KEYS) {
-      const old = storage.load(k);
-      if (old) {
-        storage.save(KEY, old);
-        storage.clear(k);
-        break;
-      }
-    }
-  }
-}
-
 function mergeById(local = [], remote = []) {
   const map = new Map();
   for (const m of local) if (m?.id) map.set(m.id, m);
   for (const m of remote) if (m?.id) map.set(m.id, m);
   return Array.from(map.values());
 }
-
-const genLocalId = () =>
-  `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -77,7 +59,7 @@ export function AppProvider({ children }) {
     const userId = localStorage.getItem("userId");
     const username = localStorage.getItem("username");
     if (token && userId) {
-      dispatch({ type: "LOGIN", payload: { id: userId, username } });  // username 추가
+      dispatch({ type: "LOGIN", payload: { id: userId, username } });
     }
 
     let cancelled = false;
@@ -90,7 +72,6 @@ export function AppProvider({ children }) {
         }
         const currentUserId = userId;
 
-        migrateStorageKey();
         const cached = storage.load(KEY);
         const bootstrap = {
           user: cached?.user || { id: currentUserId },
@@ -124,7 +105,7 @@ export function AppProvider({ children }) {
 
   const actions = {
     async addMovie(input) {
-      const userId = state.user?.id || Api.devUserId();
+      const userId = state.user?.id;
       try {
         const { movie } = await Api.createMovie({ ...input, userId });
         dispatch({ type: "ADD", payload: movie });
@@ -132,13 +113,9 @@ export function AppProvider({ children }) {
         storage.save(KEY, snapshot);
         localStorage.removeItem("recommendResult");
         return movie;
-      } catch {
-        const localMovie = { ...input, id: genLocalId(), userId };
-        dispatch({ type: "ADD", payload: localMovie });
-        const snapshot = { user: state.user || { id: userId }, movies: [localMovie, ...state.movies] };
-        storage.save(KEY, snapshot);
-        localStorage.removeItem("recommendResult");
-        return localMovie;
+      } catch (err) {
+        console.error("addMovie failed", err);
+        throw err;
       }
     },
 

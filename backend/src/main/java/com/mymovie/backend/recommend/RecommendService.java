@@ -25,8 +25,8 @@ public class RecommendService {
                 .map(m -> String.format("제목: %s, 별점: %.1f, 장르: %s, 메모: %s",
                         m.getTitle(),
                         m.getRating(),
-                        m.getGenres() != null ? String.join(", ", m.getGenres()) : "없음",
-                        m.getMemo() != null ? m.getMemo() : "없음"))
+                        m.getGenres() != null ? String.join(", ", m.getGenres()) : "없음"
+                        ))
                 .collect(Collectors.joining("\n"));
         if (movieSummary.isBlank()) {
             return "별점 4점 이상인 영화가 없어서 추천을 드리기 어렵습니다.";
